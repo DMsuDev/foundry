@@ -35,4 +35,4 @@ endfunction()
 # ------------------------------------------------------------------------------
 
 # Logging Examples
-# foundry_add_example(name "dir/name.cpp" "folder")
+foundry_add_example(scope_guard_example "memory/scope_guard_example.cpp" "memory")
