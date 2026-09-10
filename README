@@ -1,0 +1,25 @@
+# Foundry
+
+[![C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?style=flat&logo=cplusplus&logoColor=white)](https://isocpp.org/)
+![Platform Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat&logo=windows&logoColor=white)
+![Platform Linux](https://img.shields.io/badge/Platform-Linux-2d2d2d?style=flat&logo=linux&logoColor=white)
+![Platform macOS](https://img.shields.io/badge/Platform-macOS-000000?style=flat&logo=apple&logoColor=white)
+![License](https://img.shields.io/github/license/DMsuDev/foundry?style=flat&label=License&logo=open-source-initiative&logoColor=white)
+
+**Foundry** is a cross-platform C++ utility library providing a collection of general-purpose tools for developers.
+
+Built with **C++17** as its baseline standard, it targets **Linux, macOS, and Windows** with a focus on simple, reusable APIs.
+
+## 🚧 Project Status
+
+> [!WARNING]
+> Foundry is currently in **WIP development**. The public API is not yet considered stable and may change between releases.
+
+Until the first stable release, consumers should pin Foundry to a specific release tag or commit rather than tracking the development branch.
+
+The current version is defined in the root [`VERSION`](VERSION) file.
+
+## 📄 License
+
+**Foundry** is licensed under the **MIT License**. <br>
+See [`LICENSE`](LICENSE) for more information.
