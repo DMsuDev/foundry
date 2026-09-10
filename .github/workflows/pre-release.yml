@@ -111,7 +111,7 @@ jobs:
           if [[ -n "${PREVIOUS}" ]]; then
             echo "" >> CHANGES.md
             echo "---" >> CHANGES.md
-            echo "**Full Changelog**: https://github.com/DMsuDev/Foundry/compare/${PREVIOUS}...${CURRENT}" >> CHANGES.md
+            echo "**Full Changelog**: https://github.com/DMsuDev/foundry/compare/${PREVIOUS}...${CURRENT}" >> CHANGES.md
           fi
 
           echo

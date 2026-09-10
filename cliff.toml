@@ -21,7 +21,7 @@ body = """
 {%- if breaking_commits | length > 0 %}
   ### 💥 Breaking Changes
   {% for commit in breaking_commits %}
-      - {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DMsuDev/Foundry/commit/{{ commit.id }}))\
+      - {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DMsuDev/foundry/commit/{{ commit.id }}))\
     {% if commit.body %}
 
       {{ commit.body | trim | indent(prefix="  ", first=true) }}\
@@ -38,7 +38,7 @@ body = """
   {%- if non_breaking | length > 0 %}
   ### {{ group | striptags | trim | upper_first }}
   {% for commit in non_breaking %}
-      - {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DMsuDev/Foundry/commit/{{ commit.id }}))\
+      - {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DMsuDev/foundry/commit/{{ commit.id }}))\
     {% if commit.body %}
 
       {{ commit.body | trim | indent(prefix="  ", first=true) }}\
@@ -86,7 +86,7 @@ split_commits = false
 # Preprocessors: transform the commit TEXT before it's parsed/grouped.
 commit_preprocessors = [
   # Example: auto-link issue/PR references if you ever use them
-  # { pattern = '\\((\\w+\\s)?#([0-9]+)\\)', replace = "([#${2}](https://github.com/DMsuDev/Foundry/issues/${2}))" },
+  # { pattern = '\\((\\w+\\s)?#([0-9]+)\\)', replace = "([#${2}](https://github.com/DMsuDev/foundry/issues/${2}))" },
 ]
 
 # Prevents a "breaking" commit from being dropped if it also matches a
@@ -153,7 +153,7 @@ fail_on_unmatched_commit = false
 
 # Turns references (issue/PR/RFC...) into clickable links.
 link_parsers = [
-  { pattern = "#(\\d+)", href = "https://github.com/DMsuDev/Foundry/issues/$1" },
+  { pattern = "#(\\d+)", href = "https://github.com/DMsuDev/foundry/issues/$1" },
 ]
 
 # Only include tags reachable from the current branch
