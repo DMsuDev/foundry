@@ -1,0 +1,18 @@
+# ==============================================================================
+# FOUNDRY - PACKAGE CONFIGURATION
+# ==============================================================================
+# Description: Configures the Foundry package for downstream consumers.
+#
+#  Copyright (c) 2026 @DMsuDev. Licensed under the MIT License.
+#  Distributed under the MIT License (http://opensource.org/licenses/MIT)
+# ==============================================================================
+
+@PACKAGE_INIT@
+
+# ------------------------------------------------------------------------------
+#  Export Targets
+# ------------------------------------------------------------------------------
+
+include("${CMAKE_CURRENT_LIST_DIR}/FoundryTargets.cmake")
+
+check_required_components(Foundry)
