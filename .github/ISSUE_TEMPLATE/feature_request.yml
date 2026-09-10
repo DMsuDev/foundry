@@ -7,7 +7,7 @@ body:
       value: |
         Before submitting a feature request, please keep the following in mind.
 
-        - **Search [open](https://github.com/DMsuDev/Foundry/issues) and [closed](https://github.com/DMsuDev/Foundry/issues?q=is%3Aissue+is%3Aclosed) issues** to check if the feature has already been suggested.
+        - **Search [open](https://github.com/DMsuDev/foundry/issues) and [closed](https://github.com/DMsuDev/foundry/issues?q=is%3Aissue+is%3Aclosed) issues** to check if the feature has already been suggested.
         - **Be specific** about what you want and why. Vague requests are harder to evaluate and implement.
 
         ---

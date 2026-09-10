@@ -9,7 +9,7 @@ body:
 
         - **Use a descriptive title** that clearly summarizes the problem.
         - **Report one bug per issue.** If you encounter multiple unrelated bugs, open a separate issue for each one.
-        - **Search [open](https://github.com/DMsuDev/Foundry/issues) and [closed](https://github.com/DMsuDev/Foundry/issues?q=is%3Aissue+is%3Aclosed) issues** before opening a new one — it may already have been reported or fixed.
+        - **Search [open](https://github.com/DMsuDev/foundry/issues) and [closed](https://github.com/DMsuDev/foundry/issues?q=is%3Aissue+is%3Aclosed) issues** before opening a new one — it may already have been reported or fixed.
         - **Use the latest release** and verify that the issue is still present before reporting.
 
         ---
