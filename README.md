@@ -21,6 +21,34 @@ Runs a piece of cleanup code when the current scope ends, whether it exits norma
 
 A type-safe wrapper for enum-based bitmasks. `Flags<E>` lets you combine, check, and clear options through a proper type instead of raw integers, and `FOUNDRY_DECLARE_FLAGS` generates the operators needed to use an enum with it.
 
+## CMake integration
+
+Foundry can be integrated into a CMake project using either `FetchContent` or `add_subdirectory()`.
+
+### FetchContent
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+  foundry
+  GIT_REPOSITORY https://github.com/DMsuDev/foundry.git
+  GIT_TAG v0.1.0
+)
+
+FetchContent_MakeAvailable(foundry)
+target_link_libraries(my_app PRIVATE Foundry::Foundry)
+```
+
+> For reproducible builds, pin `GIT_TAG` to a specific release tag or commit hash.
+
+### Subdirectory
+
+```cmake
+add_subdirectory(vendor/foundry)
+target_link_libraries(my_app PRIVATE Foundry::Foundry)
+```
+
 ## Examples
 
 | Example                 | Source                                                                               | Description                                           |
