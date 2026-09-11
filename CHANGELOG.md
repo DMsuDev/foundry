@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-09-11
+
+### 💥 Breaking Changes
+
+- Rename scope exit macros to FOUNDRY_SCOPE_EXIT ([215c418](https://github.com/DMsuDev/foundry/commit/215c418b1c7c2725666f5a5b3fb91881ba97ca45))
+
+> ⚠️ The scope exit macros have been renamed to simplify the API and prevent name collision issues with multiple macro expansions on the same line.
+
+- Renamed `FOUNDRY_ON_SCOPE_EXIT` to `FOUNDRY_SCOPE_EXIT`
+- Renamed `FOUNDRY_ON_SCOPE_EXIT_NAMED` to `FOUNDRY_SCOPE_EXIT_NAMED`
+- Updated macro expansion to use `__COUNTER__` instead of `__LINE__` for unique identifier generation
+- Cleaned up usage syntax (passing statements directly without surrounding `{}`)
+
+To migrate your code:
+- Replace all occurrences of `FOUNDRY_ON_SCOPE_EXIT({ code });` with `FOUNDRY_SCOPE_EXIT(code;)`
+- Replace all occurrences of `FOUNDRY_ON_SCOPE_EXIT_NAMED(name, { code });` with `FOUNDRY_SCOPE_EXIT_NAMED(name, { code; })`
+
 ## [0.1.0] - 2026-09-10
 
 ### 🏗️ Project Setup
