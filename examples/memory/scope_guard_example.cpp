@@ -42,7 +42,7 @@ int main()
 // Demo 1: Unconditional Cleanup
 // ============================================================================
 
-// Demonstrates FOUNDRY_ON_SCOPE_EXIT for releasing resources that MUST
+// Demonstrates FOUNDRY_SCOPE_EXIT for releasing resources that MUST
 // be cleaned up when exiting the block, regardless of how it finishes.
 static void Demo_UnconditionalCleanup()
 {
@@ -52,9 +52,9 @@ static void Demo_UnconditionalCleanup()
         std::cout << "[1] Allocating resource / opening block...\n";
 
         // This lambda will execute automatically upon leaving this {} block
-        FOUNDRY_ON_SCOPE_EXIT({
+        FOUNDRY_SCOPE_EXIT(
             std::cout << "[3] [Cleanup] Resource released automatically via RAII.\n";
-        });
+        );
 
         std::cout << "[2] Performing work inside the block...\n";
     } // <-- ScopeGuard is destroyed here and executes the cleanup block.
@@ -66,7 +66,7 @@ static void Demo_UnconditionalCleanup()
 // Demo 2: Rollback Pattern using dismiss()
 // ============================================================================
 
-// Demonstrates FOUNDRY_ON_SCOPE_EXIT_NAMED to disarm the guard if the
+// Demonstrates FOUNDRY_SCOPE_EXIT_NAMED to disarm the guard if the
 // operation completes successfully.
 static void Demo_RollbackOnFailure(bool simulate_failure)
 {
@@ -77,7 +77,7 @@ static void Demo_RollbackOnFailure(bool simulate_failure)
     std::cout << "    - Creating temporary database entry...\n";
 
     // Register the cancellation (Rollback) action by default
-    FOUNDRY_ON_SCOPE_EXIT_NAMED(rollback_guard, {
+    FOUNDRY_SCOPE_EXIT_NAMED(rollback_guard, {
         std::cout << "    - [ROLLBACK] Reverting database changes due to failure!\n";
     });
 

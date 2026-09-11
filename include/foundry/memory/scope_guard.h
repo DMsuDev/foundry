@@ -94,28 +94,28 @@ template <typename F>
 // ============================================================================
 
 /**
- * @def FOUNDRY_ON_SCOPE_EXIT(code)
+ * @def FOUNDRY_SCOPE_EXIT(code)
  * @brief Executes @p code automatically when exiting the current scope.
  *
  * Example:
  * @code{.cpp}
- * FOUNDRY_ON_SCOPE_EXIT(fclose(file));
+ * FOUNDRY_SCOPE_EXIT(fclose(file));
  * @endcode
  */
-#define FOUNDRY_ON_SCOPE_EXIT(code) \
-    auto FOUNDRY_DETAIL_CONCAT(foundry_scope_guard_, __LINE__) = \
+#define FOUNDRY_SCOPE_EXIT(code) \
+    auto FOUNDRY_DETAIL_UNIQUE_NAME(foundry_scope_guard_) = \
         ::foundry::memory::make_scope_guard([&]() noexcept { code; })
 
 /**
- * @def FOUNDRY_ON_SCOPE_EXIT_NAMED(name, code)
+ * @def FOUNDRY_SCOPE_EXIT_NAMED(name, code)
  * @brief Creates a named scope guard that can be cancelled with @c name.dismiss().
  *
  * Example:
  * @code{.cpp}
- * FOUNDRY_ON_SCOPE_EXIT_NAMED(guard, db.rollback());
+ * FOUNDRY_SCOPE_EXIT_NAMED(guard, db.rollback());
  * // ... perform operations ...
  * guard.dismiss(); // Operation succeeded, skip rollback
  * @endcode
  */
-#define FOUNDRY_ON_SCOPE_EXIT_NAMED(name, code) \
+#define FOUNDRY_SCOPE_EXIT_NAMED(name, code) \
     auto name = ::foundry::memory::make_scope_guard([&]() noexcept { code; })

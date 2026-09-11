@@ -130,9 +130,9 @@ TEST(ScopeGuardTest, MacroOnScopeExit)
     bool executed = false;
 
     {
-        FOUNDRY_ON_SCOPE_EXIT({
+        FOUNDRY_SCOPE_EXIT(
             executed = true;
-        });
+        );
         EXPECT_FALSE(executed);
     }
 
@@ -144,7 +144,7 @@ TEST(ScopeGuardTest, MacroOnScopeExitNamed)
     bool executed = false;
 
     {
-        FOUNDRY_ON_SCOPE_EXIT_NAMED(rollback, {
+        FOUNDRY_SCOPE_EXIT_NAMED(rollback, {
             executed = true;
         });
 

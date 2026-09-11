@@ -19,4 +19,8 @@
 #define FOUNDRY_DETAIL_CONCAT_IMPL(a, b) a##b
 #define FOUNDRY_DETAIL_CONCAT(a, b)      FOUNDRY_DETAIL_CONCAT_IMPL(a, b)
 
+// Unique name generation: appends __COUNTER__ to a prefix.
+// Prefer over __LINE__-based names when macros may expand on the same line.
+#define FOUNDRY_DETAIL_UNIQUE_NAME(prefix) FOUNDRY_DETAIL_CONCAT(prefix, __COUNTER__)
+
 /// @endcond

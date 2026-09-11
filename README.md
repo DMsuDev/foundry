@@ -15,7 +15,7 @@ Built with **C++17** as its baseline standard, Foundry targets **Linux, macOS, a
 
 ### 🔹 Scope Guard
 
-Runs a piece of cleanup code when the current scope ends, whether it exits normally, early, or through an exception. Use `ScopeGuard` directly, or the `FOUNDRY_ON_SCOPE_EXIT` / `FOUNDRY_ON_SCOPE_EXIT_NAMED` macros to declare the cleanup inline at the point where the resource is acquired.
+Runs a piece of cleanup code when the current scope ends, whether it exits normally, early, or through an exception. Use `ScopeGuard` directly, or the `FOUNDRY_SCOPE_EXIT` / `FOUNDRY_SCOPE_EXIT_NAMED` macros to declare the cleanup inline at the point where the resource is acquired.
 
 ### 🔹 Flags
 
