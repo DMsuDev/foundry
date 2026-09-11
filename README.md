@@ -1,8 +1,8 @@
 # Foundry
 
 [![C++17](https://img.shields.io/badge/Language-C%2B%2B17-00599C?style=flat&logo=cplusplus&logoColor=white)](https://isocpp.org/)
-[![Latest Release](https://img.shields.io/github/v/release/DMsuDev/foundry?style=flat&label=Release&color=4C8BF5)](https://github.com/DMsuDev/foundry/releases/latest)
-[![License](https://img.shields.io/github/license/DMsuDev/foundry?style=flat&label=License&color=2EA44F)](https://github.com/DMsuDev/foundry/blob/main/LICENSE)
+[![Version](https://img.shields.io/github/v/release/DMsuDev/foundry?style=flat&label=Version&color=purple)](https://github.com/DMsuDev/foundry/releases/latest)
+[![License MIT](https://img.shields.io/github/license/DMsuDev/foundry?style=flat&label=License&logo=open-source-initiative&logoColor=white)](https://github.com/DMsuDev/foundry/blob/main/LICENSE)
 ![Platform Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat&logo=windows&logoColor=white)
 ![Platform Linux](https://img.shields.io/badge/Platform-Linux-2d2d2d?style=flat&logo=linux&logoColor=white)
 ![Platform macOS](https://img.shields.io/badge/Platform-macOS-000000?style=flat&logo=apple&logoColor=white)
@@ -23,10 +23,10 @@ A type-safe wrapper for enum-based bitmasks. `Flags<E>` lets you combine, check,
 
 ## Examples
 
-| Example                 | Source                                                                                                       | Description                                           |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| **scope_guard_example** | [`examples/memory/scope_guard/scope_guard_example.cpp`](examples/memory/scope_guard/scope_guard_example.cpp) | Basic usage of `ScopeGuard` and `make_scope_guard()`. |
-| **flags_example**       | [`examples/types/flags/flags_example.cpp`](examples/types/flags/flags_example.cpp)                           | Type-safe bitmask operations with `Flags<E>`.         |
+| Example                 | Source                                                                               | Description                                           |
+| ----------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| **scope_guard_example** | [`examples/memory/scope_guard_example.cpp`](examples/memory/scope_guard_example.cpp) | Basic usage of `ScopeGuard` and `make_scope_guard()`. |
+| **flags_example**       | [`examples/types/flags_example.cpp`](examples/types/flags_example.cpp)               | Type-safe bitmask operations with `Flags<E>`.         |
 
 ## License
 
