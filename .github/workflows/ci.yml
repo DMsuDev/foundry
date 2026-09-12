@@ -1,0 +1,63 @@
+name: "CI"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**"
+      - "include/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+  pull_request:
+    branches: [main]
+    paths:
+      - "examples/**"
+      - "include/**"
+      - "tests/**"
+      - "CMakeLists.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+
+      - name: Configure (Linux)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DFOUNDRY_BUILD_TESTS=ON \
+            -DFOUNDRY_BUILD_EXAMPLES=ON \
+            -DFOUNDRY_BUILD_WARNINGS=ON
+
+      - name: Configure (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cmake -B build \
+            -DFOUNDRY_BUILD_TESTS=ON \
+            -DFOUNDRY_BUILD_EXAMPLES=ON \
+            -DFOUNDRY_BUILD_WARNINGS=ON
+
+      - name: Build
+        run: cmake --build build --config Debug --parallel
+
+      - name: Test
+        run: ctest --test-dir build --build-config Debug --output-on-failure --parallel

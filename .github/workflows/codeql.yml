@@ -1,0 +1,39 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "include/**"
+      - "examples/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "include/**"
+      - "examples/**"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Initialize CodeQL
+
+        uses: github/codeql-action/init@v3
+        with:
+          languages: c-cpp
+          build-mode: none
+          config: |
+            paths:
+              - include
+              - examples
+            paths-ignore:
+              - tests
+              - cmake
+              - "**/*.md"
