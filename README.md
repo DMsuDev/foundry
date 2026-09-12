@@ -17,6 +17,52 @@ Built with **C++17** as its baseline standard, Foundry targets **Linux, macOS, a
 
 Runs a piece of cleanup code when the current scope ends, whether it exits normally, early, or through an exception. Use `ScopeGuard` directly, or the `FOUNDRY_SCOPE_EXIT` / `FOUNDRY_SCOPE_EXIT_NAMED` macros to declare the cleanup inline at the point where the resource is acquired.
 
+```cpp
+FILE* file = fopen("data.txt", "r");
+
+FOUNDRY_SCOPE_EXIT {
+    fclose(file);  // always runs, even on early return or exception
+};
+```
+
+For cases where cleanup should be conditional, a named guard can be dismissed if the operation succeeds:
+
+```cpp
+db.begin_transaction();
+
+FOUNDRY_SCOPE_EXIT_NAMED(rollback) {
+    db.rollback();
+};
+
+do_work();          // if this throws, rollback fires
+rollback.dismiss(); // success: skip the rollback
+db.commit();
+```
+
+### 🔹 Run Once / Run At Exit
+
+`FOUNDRY_RUN_ONCE` executes a block exactly once per call site. The first time that line
+is reached at runtime the block runs; all subsequent calls skip it entirely.
+Thread-safe via C++11 static initialization guarantees.
+
+```cpp
+void init_subsystem() {
+    FOUNDRY_RUN_ONCE {
+        AudioSystem::global_init();  // called once, no matter how many times
+    };                               // init_subsystem() is invoked
+}
+```
+
+`FOUNDRY_RUN_AT_EXIT` registers a block to run when the program exits, during static storage destruction. Equivalent to `std::atexit` but with lambda syntax. Multiple registrations fire in reverse order of declaration (LIFO).
+
+```cpp
+FOUNDRY_RUN_AT_EXIT {
+    LogSystem::flush_all();  // runs after main() returns
+};
+```
+
+> **Note:** Always capture by value (`[=]`) inside `FOUNDRY_RUN_AT_EXIT` blocks. Local variables captured by reference will be dangling at shutdown time.
+
 ### 🔹 Flags
 
 A type-safe wrapper for enum-based bitmasks. `Flags<E>` lets you combine, check, and clear options through a proper type instead of raw integers, and `FOUNDRY_DECLARE_FLAGS` generates the operators needed to use an enum with it.
@@ -33,7 +79,7 @@ include(FetchContent)
 FetchContent_Declare(
   foundry
   GIT_REPOSITORY https://github.com/DMsuDev/foundry.git
-  GIT_TAG v0.1.1
+  GIT_TAG v0.2.0
 )
 
 FetchContent_MakeAvailable(foundry)
@@ -51,10 +97,11 @@ target_link_libraries(my_app PRIVATE Foundry::Foundry)
 
 ## Examples
 
-| Example                 | Source                                                                               | Description                                           |
-| ----------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
-| **scope_guard_example** | [`examples/memory/scope_guard_example.cpp`](examples/memory/scope_guard_example.cpp) | Basic usage of `ScopeGuard` and `make_scope_guard()`. |
-| **flags_example**       | [`examples/types/flags_example.cpp`](examples/types/flags_example.cpp)               | Type-safe bitmask operations with `Flags<E>`.         |
+| Example                 | Source                                                                               | Description                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| **scope_guard_example** | [`examples/memory/scope_guard_example.cpp`](examples/memory/scope_guard_example.cpp) | Basic usage of `ScopeGuard` and `make_scope_guard()`.                 |
+| **run_once_example**    | [`examples/memory/run_once_example.cpp`](examples/memory/run_once_example.cpp)       | One-shot execution with `FOUNDRY_RUN_ONCE` and `FOUNDRY_RUN_AT_EXIT`. |
+| **flags_example**       | [`examples/types/flags_example.cpp`](examples/types/flags_example.cpp)               | Type-safe bitmask operations with `Flags<E>`.                         |
 
 ## License
 
