@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-09-12
+
+### 💥 Breaking Changes
+
+- Redesign scope guard macros to use block syntax ([a6b9862](https://github.com/DMsuDev/foundry/commit/a6b9862edb9d5910992f5157df24749724dd0801))
+
+> ⚠️ `FOUNDRY_SCOPE_EXIT` and `FOUNDRY_SCOPE_EXIT_NAMED` now expect a block `{ ... };` instead of taking code as a macro argument.
+
+- Updated `FOUNDRY_SCOPE_EXIT` and `FOUNDRY_SCOPE_EXIT_NAMED` to follow block syntax
+- Added `[[maybe_unused]]` to prevent compiler warnings
+- Tightened `ScopeGuard` type constraint with `std::is_invocable_r_v`
+
+To migrate your code:
+- Replace `FOUNDRY_SCOPE_EXIT(code);` with `FOUNDRY_SCOPE_EXIT { code; };`
+- Replace `FOUNDRY_SCOPE_EXIT_NAMED(name, code);` with `FOUNDRY_SCOPE_EXIT_NAMED(name) { code; };`
+
+### 🚀 Features
+
+- Add FOUNDRY_RUN_ONCE and FOUNDRY_RUN_AT_EXIT utilities ([2af0855](https://github.com/DMsuDev/foundry/commit/2af0855d787d17425ab4801f0ca5d266e6692fd1))
+
+  - Core utilities: Introduced thread-safe `RunOnce` and `RunAtExit` wrappers with block-syntax macros (`FOUNDRY_RUN_ONCE`, `FOUNDRY_RUN_AT_EXIT`).
+  - Test coverage: Added unit tests covering thread safety, conditional execution, and LIFO destruction ordering.
+  - Documentation & Examples: Included `run_once_example` showcasing initialization and shutdown usage patterns.
+
+### 🐛 Bug Fixes
+
+- Prevent installing header template files ([98e334c](https://github.com/DMsuDev/foundry/commit/98e334cf7fc7a1584c2c1ecca8931faa7a533cf4))
+
+- Wrap enable_flags specialization in detail namespace ([6747cce](https://github.com/DMsuDev/foundry/commit/6747cce8b3ab99b977eb566c8c61ba2b9459f789))
+
+  - Wrap `enable_flags<E>` template specialization in `foundry::types::detail` namespace within `FOUNDRY_DECLARE_FLAGS`
+  - Fixes compilation error when macro is invoked from inside a custom namespace
+
+### 🔧 Maintenance
+
+- Add CI build workflow and CodeQL static analysis ([1f8eb0d](https://github.com/DMsuDev/foundry/commit/1f8eb0d498048821e301110e72eb10fa6db4e8e3))
+
 ## [0.1.1] - 2026-09-11
 
 ### 💥 Breaking Changes
