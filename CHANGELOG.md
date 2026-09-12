@@ -41,6 +41,8 @@ To migrate your code:
 
 - Add CI build workflow and CodeQL static analysis ([1f8eb0d](https://github.com/DMsuDev/foundry/commit/1f8eb0d498048821e301110e72eb10fa6db4e8e3))
 
+- Fix Windows line continuation syntax in CI workflow ([ea9ae40](https://github.com/DMsuDev/foundry/commit/ea9ae409a207617a10721236919dc2073c3d0e1c))
+
 ## [0.1.1] - 2026-09-11
 
 ### 💥 Breaking Changes
