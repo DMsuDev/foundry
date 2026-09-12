@@ -11,7 +11,6 @@
 include_guard()
 
 include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
 
 # ------------------------------------------------------------------------------
 # Headers
@@ -20,6 +19,7 @@ include(GNUInstallDirs)
 install(
   DIRECTORY   "${PROJECT_SOURCE_DIR}/include/foundry"
   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  PATTERN     "*.h.in" EXCLUDE
 )
 
 # Generated version header (produced by configure_file in the root CMakeLists).
