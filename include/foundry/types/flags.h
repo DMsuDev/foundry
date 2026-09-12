@@ -220,6 +220,8 @@ template <typename E, typename = std::enable_if_t<::foundry::types::detail::enab
  * @see FOUNDRY_BIT
  * @see FOUNDRY_BIT64
  */
-#define FOUNDRY_DECLARE_FLAGS(E)                                          \
-    template <>                                                           \
-    struct ::foundry::types::detail::enable_flags<E> : std::true_type {};
+#define FOUNDRY_DECLARE_FLAGS(E)                          \
+    namespace foundry::types::detail {                    \
+        template <>                                       \
+        struct enable_flags<E> : std::true_type {};       \
+    }
