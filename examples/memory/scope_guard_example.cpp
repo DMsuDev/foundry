@@ -52,9 +52,9 @@ static void Demo_UnconditionalCleanup()
         std::cout << "[1] Allocating resource / opening block...\n";
 
         // This lambda will execute automatically upon leaving this {} block
-        FOUNDRY_SCOPE_EXIT(
+        FOUNDRY_SCOPE_EXIT {
             std::cout << "[3] [Cleanup] Resource released automatically via RAII.\n";
-        );
+        };
 
         std::cout << "[2] Performing work inside the block...\n";
     } // <-- ScopeGuard is destroyed here and executes the cleanup block.
@@ -77,9 +77,9 @@ static void Demo_RollbackOnFailure(bool simulate_failure)
     std::cout << "    - Creating temporary database entry...\n";
 
     // Register the cancellation (Rollback) action by default
-    FOUNDRY_SCOPE_EXIT_NAMED(rollback_guard, {
+    FOUNDRY_SCOPE_EXIT_NAMED(rollback_guard) {
         std::cout << "    - [ROLLBACK] Reverting database changes due to failure!\n";
-    });
+    };
 
     std::cout << "    - Processing step 1: Success.\n";
 

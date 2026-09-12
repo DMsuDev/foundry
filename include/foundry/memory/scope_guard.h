@@ -19,6 +19,7 @@ namespace foundry::memory {
 // ScopeGuard<F>
 // ============================================================================
 
+
 /**
  * @brief RAII guard that executes a callable on scope exit unless dismissed.
  *
@@ -31,8 +32,8 @@ template <typename F>
 class ScopeGuard {
 public:
     static_assert(
-        std::is_invocable_v<F>,
-        "foundry::ScopeGuard requires an invocable type with signature void()"
+        std::is_invocable_r_v<void, F>,
+        "foundry::ScopeGuard<F>: F must be callable with signature void()"
     );
 
     /// @brief Constructs a guard that will invoke @p f on scope exit.
@@ -87,35 +88,52 @@ template <typename F>
     return ScopeGuard<std::decay_t<F>>(std::forward<F>(f));
 }
 
+namespace detail {
+
+    struct ScopeGuardOnExit {};
+
+    template <typename F>
+    [[nodiscard]] ScopeGuard<std::decay_t<F>> operator+(ScopeGuardOnExit, F&& f) {
+        return ScopeGuard<std::decay_t<F>>(std::forward<F>(f));
+    }
+
+} // namespace detail
+
 } // namespace foundry::memory
 
 // ============================================================================
 // Macro-based API
 // ============================================================================
 
-/**
- * @def FOUNDRY_SCOPE_EXIT(code)
- * @brief Executes @p code automatically when exiting the current scope.
- *
- * Example:
- * @code{.cpp}
- * FOUNDRY_SCOPE_EXIT(fclose(file));
- * @endcode
- */
-#define FOUNDRY_SCOPE_EXIT(code) \
-    auto FOUNDRY_DETAIL_UNIQUE_NAME(foundry_scope_guard_) = \
-        ::foundry::memory::make_scope_guard([&]() noexcept { code; })
+#define FOUNDRY_DETAIL_SCOPE_GUARD \
+    ::foundry::memory::detail::ScopeGuardOnExit() + [&]()
 
 /**
- * @def FOUNDRY_SCOPE_EXIT_NAMED(name, code)
+ * @def FOUNDRY_SCOPE_EXIT
+ * @brief Executes a block automatically when exiting the current scope.
+ *
+ * @code{.cpp}
+ * FOUNDRY_SCOPE_EXIT {
+ *     fclose(file);
+ *     cleanup();
+ * };
+ * @endcode
+ */
+#define FOUNDRY_SCOPE_EXIT \
+    [[maybe_unused]] auto FOUNDRY_DETAIL_UNIQUE_NAME(foundry_scope_guard_) = \
+        FOUNDRY_DETAIL_SCOPE_GUARD
+
+/**
+ * @def FOUNDRY_SCOPE_EXIT_NAMED(name)
  * @brief Creates a named scope guard that can be cancelled with @c name.dismiss().
  *
- * Example:
  * @code{.cpp}
- * FOUNDRY_SCOPE_EXIT_NAMED(guard, db.rollback());
+ * FOUNDRY_SCOPE_EXIT_NAMED(guard) {
+ *     db.rollback();
+ * };
  * // ... perform operations ...
  * guard.dismiss(); // Operation succeeded, skip rollback
  * @endcode
  */
-#define FOUNDRY_SCOPE_EXIT_NAMED(name, code) \
-    auto name = ::foundry::memory::make_scope_guard([&]() noexcept { code; })
+#define FOUNDRY_SCOPE_EXIT_NAMED(name) \
+    [[maybe_unused]] auto name = FOUNDRY_DETAIL_SCOPE_GUARD
