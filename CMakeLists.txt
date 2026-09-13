@@ -32,11 +32,15 @@ include("${FOUNDRY_BASE_FOLDER}/cmake/helpers/build_helpers.cmake")
 #  Configuration Options
 # ------------------------------------------------------------------------------
 
-option(FOUNDRY_BUILD_TESTS         "Build Foundry's unit-test suite."            ${PROJECT_IS_TOP_LEVEL})
-option(FOUNDRY_BUILD_EXAMPLES      "Build Foundry's example programs."           ${PROJECT_IS_TOP_LEVEL})
-option(FOUNDRY_BUILD_WARNINGS      "Enable strict compiler warning suites."      ${PROJECT_IS_TOP_LEVEL})
-option(FOUNDRY_WARNINGS_AS_ERRORS  "Treat compiler warnings as hard errors."     OFF)
-option(FOUNDRY_CONSUMER_TESTS      "Build Foundry's consumer integration tests." OFF)
+# --- Build Options ---
+option(FOUNDRY_BUILD_TESTS           "Build Foundry's unit-test suite."               ${PROJECT_IS_TOP_LEVEL})
+option(FOUNDRY_BUILD_EXAMPLES        "Build Foundry's example programs."              ${PROJECT_IS_TOP_LEVEL})
+option(FOUNDRY_BUILD_WARNINGS        "Enable strict compiler warning suites."         ${PROJECT_IS_TOP_LEVEL})
+# --- Warnings ---
+option(FOUNDRY_WARNINGS_AS_ERRORS    "Treat compiler warnings as hard errors."        OFF)
+# --- Integration Tests ---
+option(FOUNDRY_CONSUMER_TESTS        "Build Foundry's consumer integration tests."    OFF)
+option(FOUNDRY_CONSUMER_TESTS_CLEANUP "Clean up install test artifacts after running." OFF)
 
 # ------------------------------------------------------------------------------
 #  Option Validation & Derived Settings
@@ -52,6 +56,14 @@ if(FOUNDRY_WARNINGS_AS_ERRORS AND NOT FOUNDRY_BUILD_WARNINGS)
     "Enabling FOUNDRY_BUILD_WARNINGS automatically."
   )
   set(FOUNDRY_BUILD_WARNINGS ON CACHE BOOL "" FORCE)
+endif()
+
+if(FOUNDRY_CONSUMER_TESTS_CLEANUP AND NOT FOUNDRY_CONSUMER_TESTS)
+  message(WARNING
+    "[Foundry] FOUNDRY_CONSUMER_TESTS_CLEANUP requires FOUNDRY_CONSUMER_TESTS. "
+    "Disabling FOUNDRY_CONSUMER_TESTS_CLEANUP automatically."
+  )
+  set(FOUNDRY_CONSUMER_TESTS_CLEANUP OFF CACHE BOOL "" FORCE)
 endif()
 
 # ------------------------------------------------------------------------------
