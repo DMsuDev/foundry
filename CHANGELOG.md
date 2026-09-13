@@ -8,18 +8,24 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### 🛠️ Build System
 
-- Restructure test architecture and add consumer integration tests ([30606a4](https://github.com/DMsuDev/foundry/commit/30606a4177b0fcfaa3fad38e09dbd268ee0fd3db))
+- Restructure test architecture and add consumer integration tests ([5895c0c](https://github.com/DMsuDev/foundry/commit/5895c0cc8fcff2682ae555d54b5e6cc20ba3ea0e))
 
   - Restructure `tests/` into `unit/` and CMake integration subdirectories
   - Move GoogleTest setup logic into `tests/unit/CMakeLists.txt`
   - Add consumer integration tests for `add_subdirectory` and `FetchContent`
   - Introduce `FOUNDRY_INSTALL_TESTS_CLEANUP` option and validation logic
 
-- Remove redundant INCLUDES DESTINATION from target install ([678ad4c](https://github.com/DMsuDev/foundry/commit/678ad4cb783261a3afde6aed806824953ad44c16))
+- Remove redundant INCLUDES DESTINATION from target install ([5022249](https://github.com/DMsuDev/foundry/commit/5022249ad1c663cd3737f95fb7104d8278323f42))
 
 ### 🔧 Maintenance
 
 - Generate version header and check release existence in workflow ([ebba698](https://github.com/DMsuDev/foundry/commit/ebba6986fad4957e4a556c407d1336ba5e4a2577))
+
+- Add macOS matrix runner and enable consumer integration tests ([c40c031](https://github.com/DMsuDev/foundry/commit/c40c031bb9c3d2af7a2e34b2631e452b82f9457d))
+
+  - Include `cmake/**` in workflow path triggers for `push` and `pull_request`
+  - Add `macos-latest` to matrix OS runners
+  - Enable `FOUNDRY_CONSUMER_TESTS` and `FOUNDRY_CONSUMER_TESTS_CLEANUP` in build steps
 
 ## [0.2.0] - 2026-09-12
 
