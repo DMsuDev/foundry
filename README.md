@@ -15,7 +15,10 @@ Built with **C++17** as its baseline standard, Foundry targets **Linux, macOS, a
 
 ### 🔹 Scope Guard
 
-Runs a piece of cleanup code when the current scope ends, whether it exits normally, early, or through an exception. Use `ScopeGuard` directly, or the `FOUNDRY_SCOPE_EXIT` / `FOUNDRY_SCOPE_EXIT_NAMED` macros to declare the cleanup inline at the point where the resource is acquired.
+Runs a piece of cleanup code when the current scope ends, whether it exits normally, early, or through an exception. Use `ScopeGuard` directly, or the `FOUNDRY_SCOPE_EXIT` / `FOUNDRY_SCOPE_EXIT_NAMED` macros to declare the cleanup inline at the point where the resource is acquired. A named guard can be dismissed if the operation succeeds.
+
+<details>
+<summary>Example</summary>
 
 ```cpp
 FILE* file = fopen("data.txt", "r");
@@ -23,11 +26,8 @@ FILE* file = fopen("data.txt", "r");
 FOUNDRY_SCOPE_EXIT {
     fclose(file);  // always runs, even on early return or exception
 };
-```
 
-For cases where cleanup should be conditional, a named guard can be dismissed if the operation succeeds:
-
-```cpp
+// Dismissible: cleanup fires only if do_work() throws
 db.begin_transaction();
 
 FOUNDRY_SCOPE_EXIT_NAMED(rollback) {
@@ -39,23 +39,26 @@ rollback.dismiss(); // success: skip the rollback
 db.commit();
 ```
 
+</details>
+
+---
+
 ### 🔹 Run Once / Run At Exit
 
-`FOUNDRY_RUN_ONCE` executes a block exactly once per call site. The first time that line
-is reached at runtime the block runs; all subsequent calls skip it entirely.
-Thread-safe via C++11 static initialization guarantees.
+`FOUNDRY_RUN_ONCE` executes a block exactly once per call site, no matter how many times that line is reached at runtime. Thread-safe via C++11 static initialization guarantees.
+
+`FOUNDRY_RUN_AT_EXIT` registers a block to run when the program exits, during static storage destruction. Equivalent to `std::atexit` but with lambda syntax. Multiple registrations fire in reverse order of declaration (LIFO).
+
+<details>
+<summary>Example</summary>
 
 ```cpp
 void init_subsystem() {
     FOUNDRY_RUN_ONCE {
-        AudioSystem::global_init();  // called once, no matter how many times
-    };                               // init_subsystem() is invoked
+        AudioSystem::global_init();
+    };
 }
-```
 
-`FOUNDRY_RUN_AT_EXIT` registers a block to run when the program exits, during static storage destruction. Equivalent to `std::atexit` but with lambda syntax. Multiple registrations fire in reverse order of declaration (LIFO).
-
-```cpp
 FOUNDRY_RUN_AT_EXIT {
     LogSystem::flush_all();  // runs after main() returns
 };
@@ -63,9 +66,42 @@ FOUNDRY_RUN_AT_EXIT {
 
 > **Note:** Always capture by value (`[=]`) inside `FOUNDRY_RUN_AT_EXIT` blocks. Local variables captured by reference will be dangling at shutdown time.
 
+</details>
+
+---
+
 ### 🔹 Flags
 
-A type-safe wrapper for enum-based bitmasks. `Flags<E>` lets you combine, check, and clear options through a proper type instead of raw integers, and `FOUNDRY_DECLARE_FLAGS` generates the operators needed to use an enum with it.
+A type-safe wrapper for enum-based bitmasks. `Flags<E>` lets you combine, test, and mutate a set of options through a proper type instead of raw integers, preventing accidental mixing of unrelated enums at compile time. Supports both 32-bit and 64-bit underlying types.
+
+Place `FOUNDRY_DECLARE_FLAGS(YourEnum)` after the enum definition to generate the operators needed to use it with `Flags<E>`.
+
+<details>
+<summary>Example</summary>
+
+<br>
+
+```cpp
+enum class Permission : std::uint32_t {
+    None    = 0,
+    Read    = FOUNDRY_BIT(0),
+    Write   = FOUNDRY_BIT(1),
+    Execute = FOUNDRY_BIT(2),
+};
+
+FOUNDRY_DECLARE_FLAGS(Permission)
+
+Flags<Permission> perms = Permission::Read | Permission::Write;
+
+perms.has(Permission::Read);  // true
+perms.set(Permission::Execute);
+perms.unset(Permission::Write);
+perms.toggle(Permission::Read);
+perms.any();   // true if at least one bit is set
+perms.clear();
+```
+
+</details>
 
 ## CMake integration
 
