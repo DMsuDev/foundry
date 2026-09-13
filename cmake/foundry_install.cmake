@@ -33,9 +33,8 @@ install(
 # ------------------------------------------------------------------------------
 
 install(
-  TARGETS     Foundry
-  EXPORT      FoundryTargets
-  INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  TARGETS Foundry
+  EXPORT  FoundryTargets
 )
 
 install(
