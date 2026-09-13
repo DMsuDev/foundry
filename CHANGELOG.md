@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-09-13
+
+### 🛠️ Build System
+
+- Restructure test architecture and add consumer integration tests ([30606a4](https://github.com/DMsuDev/foundry/commit/30606a4177b0fcfaa3fad38e09dbd268ee0fd3db))
+
+  - Restructure `tests/` into `unit/` and CMake integration subdirectories
+  - Move GoogleTest setup logic into `tests/unit/CMakeLists.txt`
+  - Add consumer integration tests for `add_subdirectory` and `FetchContent`
+  - Introduce `FOUNDRY_INSTALL_TESTS_CLEANUP` option and validation logic
+
+- Remove redundant INCLUDES DESTINATION from target install ([678ad4c](https://github.com/DMsuDev/foundry/commit/678ad4cb783261a3afde6aed806824953ad44c16))
+
+### 🔧 Maintenance
+
+- Generate version header and check release existence in workflow ([ebba698](https://github.com/DMsuDev/foundry/commit/ebba6986fad4957e4a556c407d1336ba5e4a2577))
+
 ## [0.2.0] - 2026-09-12
 
 ### 💥 Breaking Changes
