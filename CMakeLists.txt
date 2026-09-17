@@ -115,7 +115,7 @@ target_include_directories(Foundry PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_features(Foundry INTERFACE cxx_std_17)
+target_compile_features(Foundry PUBLIC cxx_std_17)
 
 # --- Configuration of macro definitions Export/Import ---
 if(BUILD_SHARED_LIBS)
