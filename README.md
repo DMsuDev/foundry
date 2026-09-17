@@ -140,7 +140,7 @@ include(FetchContent)
 FetchContent_Declare(
   foundry
   GIT_REPOSITORY https://github.com/DMsuDev/foundry.git
-  GIT_TAG v0.2.1
+  GIT_TAG v0.3.0
 )
 
 FetchContent_MakeAvailable(foundry)
