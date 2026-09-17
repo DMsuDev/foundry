@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-09-17
+
+### 🚀 Features
+
+- Add visibility macros header for shared library exports ([e2804bb](https://github.com/DMsuDev/foundry/commit/e2804bb0cdf1cbb41974ae4e4359fd127f5f9bd1))
+
+- Add platform paths utilities, example, and unit tests ([2bbe110](https://github.com/DMsuDev/foundry/commit/2bbe110a7d81b5d3ca97410e84b70a953fcd5e92))
+
+  - Add cross-platform runtime path utilities in foundry::platform namespace:
+    working_directory(), executable_path(), executable_directory(), and temp_directory()
+  - Implement Windows, Linux, and macOS OS-specific path resolution
+
+### 🐛 Bug Fixes
+
+- Remove redundant release existence check ([9027d24](https://github.com/DMsuDev/foundry/commit/9027d244ddd11ec5763a2e7cfd2a1c95cc87861b))
+
+- Enforce C++17 feature in PUBLIC scope for Foundry target ([e498528](https://github.com/DMsuDev/foundry/commit/e498528d460c499c4ea6c3c934c8520696b93784))
+
+### 🛠️ Build System
+
+- Convert Foundry from interface to static/shared target ([e9feacf](https://github.com/DMsuDev/foundry/commit/e9feacf0ca58fc6efaa2e7558d05511546491929))
+
+  - Change Foundry target from INTERFACE to standard library using globbed sources
+  - Add BUILD_SHARED_LIBS option (default OFF)
+  - Update target_include_directories scope from INTERFACE to PUBLIC
+  - Add export/import macro definitions and default symbol visibility for shared builds
+
 ## [0.2.1] - 2026-09-13
 
 ### 🛠️ Build System
