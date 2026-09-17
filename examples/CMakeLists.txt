@@ -39,3 +39,5 @@ foundry_add_example(scope_guard_example "memory/scope_guard_example.cpp" "memory
 foundry_add_example(run_once_example "memory/run_once_example.cpp" "memory")
 
 foundry_add_example(flags_example "types/flags_example.cpp" "types")
+
+foundry_add_example(path_example "platform/paths_example.cpp" "platform")

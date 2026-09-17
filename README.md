@@ -103,6 +103,31 @@ perms.clear();
 
 </details>
 
+---
+
+### 🔹 Platform Paths
+
+Queries common filesystem locations at runtime: the working directory, the executable's path and containing directory, and the system temporary directory. All functions return `std::filesystem::path` and handle errors without throwing, except for `executable_path()` and `executable_directory()`, which throw `std::runtime_error` if the path cannot be retrieved.
+
+<details>
+<summary>Example</summary>
+
+```cpp
+#include "foundry/platform/paths.h"
+
+// Working directory — returns empty path on failure
+auto cwd = foundry::platform::working_directory();
+
+// Executable location — throws std::runtime_error on failure
+auto exe = foundry::platform::executable_path();
+auto dir = foundry::platform::executable_directory();
+
+// System temp directory — returns empty path on failure
+auto tmp = foundry::platform::temp_directory();
+```
+
+</details>
+
 ## CMake integration
 
 Foundry can be integrated into a CMake project using either `FetchContent` or `add_subdirectory()`.
@@ -138,6 +163,7 @@ target_link_libraries(my_app PRIVATE Foundry::Foundry)
 | **scope_guard_example** | [`examples/memory/scope_guard_example.cpp`](examples/memory/scope_guard_example.cpp) | Basic usage of `ScopeGuard` and `make_scope_guard()`.                 |
 | **run_once_example**    | [`examples/memory/run_once_example.cpp`](examples/memory/run_once_example.cpp)       | One-shot execution with `FOUNDRY_RUN_ONCE` and `FOUNDRY_RUN_AT_EXIT`. |
 | **flags_example**       | [`examples/types/flags_example.cpp`](examples/types/flags_example.cpp)               | Type-safe bitmask operations with `Flags<E>`.                         |
+| **paths_example**       | [`examples/platform/paths_example.cpp`](examples/platform/paths_example.cpp)         | Runtime path queries: working dir, executable, and temp directory.    |
 
 ## License
 
