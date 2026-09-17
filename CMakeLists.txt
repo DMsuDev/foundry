@@ -102,16 +102,32 @@ configure_file(
 # ------------------------------------------------------------------------------
 #  Library Sources Processing
 # ------------------------------------------------------------------------------
-add_library(Foundry INTERFACE)
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
+
+file(GLOB_RECURSE FOUNDRY_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+
+add_library(Foundry ${FOUNDRY_SOURCES})
 add_library(Foundry::Foundry ALIAS Foundry)
 
-target_include_directories(Foundry INTERFACE
+target_include_directories(Foundry PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_compile_features(Foundry INTERFACE cxx_std_17)
+
+# --- Configuration of macro definitions Export/Import ---
+if(BUILD_SHARED_LIBS)
+  # Define FOUNDRY_SHARED_LIBRARY globally for the library and its consumers
+  target_compile_definitions(Foundry PUBLIC FOUNDRY_SHARED_LIBRARY)
+  # Private macro that is only defined when compiling the Foundry source files
+  target_compile_definitions(Foundry PRIVATE FOUNDRY_EXPORTS)
+
+  # On Linux/macOS, hide symbols by default except those explicitly marked for export.
+  set_target_properties(Foundry PROPERTIES CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(Foundry PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+endif()
 
 # ------------------------------------------------------------------------------
 #  Install
