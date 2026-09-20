@@ -15,345 +15,434 @@ using foundry::types::Result;
 // Helpers
 // ============================================================================
 
-static Result<int, std::string> parse_int(std::string_view s)
+struct NoDef
 {
-    try   { return Result<int, std::string>::ok(std::stoi(std::string(s))); }
-    catch (...) { return Result<int, std::string>::err("not a valid integer"); }
-}
+    explicit NoDef(int v) : value(v) {}
+    NoDef() = delete;
+    bool operator==(const NoDef& o) const { return value == o.value; }
+    int value;
+};
+
+struct Config
+{
+    explicit Config(std::string path, int timeout)
+        : path(std::move(path)), timeout(timeout) {}
+    Config() = delete;
+
+    std::string path;
+    int         timeout;
+};
 
 // ============================================================================
 // Construction
 // ============================================================================
 
-TEST(ResultTest, OkHasValue)
+TEST(Result_Construction, OkHoldsValue)
 {
     const auto r = Result<int, std::string>::ok(42);
     EXPECT_TRUE(r.has_value());
-    EXPECT_FALSE(r.is_error());
+    EXPECT_FALSE(r.has_error());
+    EXPECT_EQ(*r, 42);
 }
 
-TEST(ResultTest, ErrHasError)
+TEST(Result_Construction, ErrHoldsError)
 {
     const auto r = Result<int, std::string>::err("oops");
     EXPECT_FALSE(r.has_value());
-    EXPECT_TRUE(r.is_error());
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), "oops");
 }
 
-TEST(ResultTest, OkEvaluatesToTrue)
+TEST(Result_Construction, NonDefaultConstructibleT)
 {
-    const auto r = Result<int, std::string>::ok(1);
+    const auto r = Result<NoDef, std::string>::ok(NoDef{ 7 });
+    EXPECT_TRUE(r.has_value());
+    EXPECT_EQ(r->value, 7);
+}
+
+TEST(Result_Construction, NonDefaultConstructibleConfig)
+{
+    const auto r = Result<Config, std::string>::ok(Config{ "app.cfg", 30 });
+    EXPECT_TRUE(r.has_value());
+    EXPECT_EQ(r->path, "app.cfg");
+    EXPECT_EQ(r->timeout, 30);
+}
+
+TEST(Result_Construction, NonDefaultConstructibleErr)
+{
+    const auto r = Result<Config, std::string>::err("not found");
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), "not found");
+}
+
+TEST(Result_Construction, SameTypeForTAndE)
+{
+    const auto ok  = Result<int, int>::ok(1);
+    const auto err = Result<int, int>::err(2);
+    EXPECT_TRUE(ok.has_value());
+    EXPECT_TRUE(err.has_error());
+    EXPECT_EQ(*ok,        1);
+    EXPECT_EQ(err.error(), 2);
+}
+
+// ============================================================================
+// State query
+// ============================================================================
+
+TEST(Result_StateQuery, BoolConversionOk)
+{
+    const auto r = Result<int, std::string>::ok(0);
     EXPECT_TRUE(static_cast<bool>(r));
 }
 
-TEST(ResultTest, ErrEvaluatesToFalse)
+TEST(Result_StateQuery, BoolConversionErr)
 {
     const auto r = Result<int, std::string>::err("e");
     EXPECT_FALSE(static_cast<bool>(r));
 }
 
 // ============================================================================
-// Value Access
+// Value access
 // ============================================================================
 
-TEST(ResultTest, ValueReturnsContainedValue)
+TEST(Result_ValueAccess, ValueOnOk)
 {
-    const auto r = Result<int, std::string>::ok(42);
-    EXPECT_EQ(r.value(), 42);
+    auto r = Result<int, std::string>::ok(10);
+    EXPECT_EQ(r.value(), 10);
 }
 
-TEST(ResultTest, DereferenceReturnsValue)
+TEST(Result_ValueAccess, ValueOnErrThrows)
 {
-    const auto r = Result<int, std::string>::ok(42);
-    EXPECT_EQ(*r, 42);
+    const auto r = Result<int, std::string>::err("e");
+    EXPECT_THROW({ (void)r.value(); }, bad_result_access);
 }
 
-TEST(ResultTest, ArrowOperatorAccessesMembers)
+TEST(Result_ValueAccess, DerefOperator)
 {
-    const auto r = Result<std::string, std::string>::ok("hello");
+    const auto r = Result<int, std::string>::ok(5);
+    EXPECT_EQ(*r, 5);
+}
+
+TEST(Result_ValueAccess, ArrowOperator)
+{
+    const auto r = Result<std::string, int>::ok("hello");
     EXPECT_EQ(r->size(), 5u);
 }
 
-TEST(ResultTest, ValueThrowsOnError)
+TEST(Result_ValueAccess, ValueOrOnOk)
 {
-    const auto r = Result<int, std::string>::err("oops");
-    EXPECT_THROW(r.value(), bad_result_access);
+    const auto r = Result<int, std::string>::ok(3);
+    EXPECT_EQ(r.value_or(99), 3);
 }
 
-TEST(ResultTest, ValueOrReturnsValueWhenOk)
+TEST(Result_ValueAccess, ValueOrOnErr)
 {
-    const auto r = Result<int, std::string>::ok(42);
-    EXPECT_EQ(r.value_or(0), 42);
-}
-
-TEST(ResultTest, ValueOrReturnsFallbackWhenError)
-{
-    const auto r = Result<int, std::string>::err("oops");
-    EXPECT_EQ(r.value_or(0), 0);
+    const auto r = Result<int, std::string>::err("e");
+    EXPECT_EQ(r.value_or(99), 99);
 }
 
 // ============================================================================
-// Error Access
+// Error access
 // ============================================================================
 
-TEST(ResultTest, ErrorReturnsContainedError)
+TEST(Result_ErrorAccess, ErrorOnErr)
 {
-    const auto r = Result<int, std::string>::err("oops");
-    EXPECT_EQ(r.error(), "oops");
+    const auto r = Result<int, std::string>::err("fail");
+    EXPECT_EQ(r.error(), "fail");
 }
 
-TEST(ResultTest, ErrorThrowsOnValue)
+TEST(Result_ErrorAccess, ErrorOnOkThrows)
 {
-    const auto r = Result<int, std::string>::ok(42);
-    EXPECT_THROW(r.error(), bad_result_access);
+    const auto r = Result<int, std::string>::ok(1);
+    EXPECT_THROW({ (void)r.error(); }, bad_result_access);
 }
 
-// ============================================================================
-// bad_result_access
-// ============================================================================
-
-TEST(ResultTest, BadResultAccessIsStdException)
+TEST(Result_ErrorAccess, ErrorOrOnErr)
 {
-    const auto r = Result<int, std::string>::err("oops");
-    try
-    {
-        [[maybe_unused]] const int n = r.value();
-        FAIL() << "Expected bad_result_access to be thrown";
-    }
-    catch (const bad_result_access& e)
-    {
-        EXPECT_NE(std::string(e.what()).find("value()"), std::string::npos);
-    }
+    const auto r = Result<int, std::string>::err("e");
+    EXPECT_EQ(r.error_or("fallback"), "e");
+}
+
+TEST(Result_ErrorAccess, ErrorOrOnOk)
+{
+    const auto r = Result<int, std::string>::ok(1);
+    EXPECT_EQ(r.error_or("fallback"), "fallback");
 }
 
 // ============================================================================
-// map
+// transform
 // ============================================================================
 
-TEST(ResultTest, MapTransformsValue)
+TEST(Result_Transform, TransformOnOk)
 {
-    const auto r = Result<int, std::string>::ok(10)
-        .map([](int n) { return n * 2; });
-
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), 20);
+    const auto r = Result<int, std::string>::ok(4)
+        .transform([](int n) { return n * 2; });
+    EXPECT_TRUE(r.has_value());
+    EXPECT_EQ(*r, 8);
 }
 
-TEST(ResultTest, MapForwardsError)
+TEST(Result_Transform, TransformOnErr)
 {
-    const auto r = Result<int, std::string>::err("oops")
-        .map([](int n) { return n * 2; });
-
-    ASSERT_TRUE(r.is_error());
-    EXPECT_EQ(r.error(), "oops");
+    const auto r = Result<int, std::string>::err("e")
+        .transform([](int n) { return n * 2; });
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), "e");
 }
 
-TEST(ResultTest, MapCanChangeValueType)
+TEST(Result_Transform, TransformChangesType)
 {
     const auto r = Result<int, std::string>::ok(42)
-        .map([](int n) { return std::to_string(n); });
+        .transform([](int n) { return std::to_string(n); });
+    EXPECT_EQ(*r, "42");
+}
 
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), "42");
+TEST(Result_Transform, TransformRvalue)
+{
+    auto r = Result<std::string, int>::ok("hello");
+    const auto r2 = std::move(r).transform([](std::string s) { return s.size(); });
+    EXPECT_EQ(*r2, 5u);
+}
+
+TEST(Result_Transform, TransformDecaysConstReturn)
+{
+    // Callable returns const int -- decay_t must strip the const so the
+    // stored type is plain int, not const int.
+    const auto r = Result<int, std::string>::ok(7)
+        .transform([](int n) -> const int { return n; });
+    static_assert(std::is_same_v<std::decay_t<decltype(r.value())>, int>,
+                  "transform must decay const from return type");
+    EXPECT_EQ(r.value(), 7);
+}
+
+TEST(Result_Transform, TransformDecaysReferenceReturn)
+{
+    // Callable returns int& -- decay_t must strip the reference so the
+    // stored type is a value, not a dangling reference.
+    static int global = 99;
+    const auto r = Result<int, std::string>::ok(0)
+        .transform([](int) -> int& { return global; });
+    EXPECT_EQ(r.value(), 99);
+}
+
+TEST(Result_Transform, TransformNonDefaultConstructible)
+{
+    const auto r = Result<Config, std::string>::ok(Config{ "app.cfg", 30 })
+        .transform([](const Config& c) { return c.timeout; });
+    EXPECT_EQ(r.value(), 30);
 }
 
 // ============================================================================
-// map_error
+// transform_error
 // ============================================================================
 
-TEST(ResultTest, MapErrorTransformsError)
+TEST(Result_TransformError, TransformErrorOnErr)
 {
     const auto r = Result<int, std::string>::err("oops")
-        .map_error([](const std::string& e) { return e.size(); });
-
-    ASSERT_TRUE(r.is_error());
+        .transform_error([](const std::string& e) { return e.size(); });
+    EXPECT_TRUE(r.has_error());
     EXPECT_EQ(r.error(), 4u);
 }
 
-TEST(ResultTest, MapErrorForwardsValue)
+TEST(Result_TransformError, TransformErrorOnOk)
 {
-    const auto r = Result<int, std::string>::ok(42)
-        .map_error([](const std::string& e) { return e.size(); });
+    const auto r = Result<int, std::string>::ok(1)
+        .transform_error([](const std::string& e) { return e.size(); });
+    EXPECT_TRUE(r.has_value());
+    EXPECT_EQ(*r, 1);
+}
 
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), 42);
+TEST(Result_TransformError, TransformErrorDecaysConstReturn)
+{
+    const auto r = Result<int, std::string>::err("e")
+        .transform_error([](const std::string& e) -> const std::size_t { return e.size(); });
+    static_assert(std::is_same_v<std::decay_t<decltype(r.error())>, std::size_t>,
+                  "transform_error must decay const from return type");
+    EXPECT_EQ(r.error(), 1u);
 }
 
 // ============================================================================
 // and_then
 // ============================================================================
 
-TEST(ResultTest, AndThenChainsOnValue)
+TEST(Result_AndThen, AndThenOnOk)
 {
-    const auto r = parse_int("10")
-        .and_then([](int n) -> Result<std::string, std::string>
+    const auto r = Result<int, std::string>::ok(5)
+        .and_then([](int n) -> Result<int, std::string>
         {
-            return Result<std::string, std::string>::ok(std::to_string(n * 2));
+            return Result<int, std::string>::ok(n + 1);
         });
-
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), "20");
+    EXPECT_EQ(*r, 6);
 }
 
-TEST(ResultTest, AndThenPropagatesError)
+TEST(Result_AndThen, AndThenOnErr)
 {
-    const auto r = parse_int("bad")
+    const auto r = Result<int, std::string>::err("e")
+        .and_then([](int n) -> Result<int, std::string>
+        {
+            return Result<int, std::string>::ok(n + 1);
+        });
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), "e");
+}
+
+TEST(Result_AndThen, AndThenShortCircuits)
+{
+    int calls = 0;
+    (void)Result<int, std::string>::err("e")
+        .and_then([&](int n) -> Result<int, std::string>
+        {
+            ++calls;
+            return Result<int, std::string>::ok(n);
+        });
+    EXPECT_EQ(calls, 0);
+}
+
+TEST(Result_AndThen, AndThenChain)
+{
+    const auto r = Result<int, std::string>::ok(2)
+        .and_then([](int n) -> Result<int, std::string>
+        {
+            return Result<int, std::string>::ok(n * 3);
+        })
         .and_then([](int n) -> Result<std::string, std::string>
         {
             return Result<std::string, std::string>::ok(std::to_string(n));
         });
-
-    EXPECT_TRUE(r.is_error());
-}
-
-TEST(ResultTest, AndThenShortCircuitsOnFirstError)
-{
-    int calls = 0;
-
-    const auto r = parse_int("bad")
-        .and_then([&](int n) -> Result<int, std::string>
-        {
-            ++calls;
-            return Result<int, std::string>::ok(n);
-        })
-        .and_then([&](int n) -> Result<int, std::string>
-        {
-            ++calls;
-            return Result<int, std::string>::ok(n);
-        });
-
-    EXPECT_TRUE(r.is_error());
-    EXPECT_EQ(calls, 0);
+    EXPECT_EQ(*r, "6");
 }
 
 // ============================================================================
 // or_else
 // ============================================================================
 
-TEST(ResultTest, OrElseRecoversFromError)
+TEST(Result_OrElse, OrElseOnErr)
 {
-    const auto r = parse_int("bad")
+    const auto r = Result<int, std::string>::err("e")
         .or_else([](const std::string&) -> Result<int, std::string>
         {
             return Result<int, std::string>::ok(0);
         });
-
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), 0);
+    EXPECT_TRUE(r.has_value());
+    EXPECT_EQ(*r, 0);
 }
 
-TEST(ResultTest, OrElseForwardsValue)
+TEST(Result_OrElse, OrElseOnOk)
 {
-    const auto r = parse_int("42")
+    const auto r = Result<int, std::string>::ok(7)
         .or_else([](const std::string&) -> Result<int, std::string>
         {
             return Result<int, std::string>::ok(0);
         });
+    EXPECT_EQ(*r, 7);
+}
 
-    ASSERT_TRUE(r.has_value());
-    EXPECT_EQ(r.value(), 42);
+TEST(Result_OrElse, OrElseShortCircuits)
+{
+    int calls = 0;
+    (void)Result<int, std::string>::ok(1)
+        .or_else([&](const std::string&) -> Result<int, std::string>
+        {
+            ++calls;
+            return Result<int, std::string>::ok(0);
+        });
+    EXPECT_EQ(calls, 0);
 }
 
 // ============================================================================
 // inspect / inspect_error
 // ============================================================================
 
-TEST(ResultTest, InspectInvokesCallbackOnValue)
+TEST(Result_Inspect, InspectCalledOnOk)
 {
-    int side = 0;
-
-    Result<int, std::string>::ok(42)
-        .inspect([&](int n) { side = n; });
-
-    EXPECT_EQ(side, 42);
+    int seen = 0;
+    Result<int, std::string>::ok(3)
+        .inspect([&](int n) { seen = n; });
+    EXPECT_EQ(seen, 3);
 }
 
-TEST(ResultTest, InspectDoesNotInvokeOnError)
+TEST(Result_Inspect, InspectNotCalledOnErr)
 {
-    int side = 0;
-
-    Result<int, std::string>::err("oops")
-        .inspect([&](int n) { side = n; });
-
-    EXPECT_EQ(side, 0);
+    int seen = 0;
+    Result<int, std::string>::err("e")
+        .inspect([&](int n) { seen = n; });
+    EXPECT_EQ(seen, 0);
 }
 
-TEST(ResultTest, InspectErrorInvokesCallbackOnError)
+TEST(Result_Inspect, InspectErrorCalledOnErr)
 {
-    std::string side;
-
-    Result<int, std::string>::err("oops")
-        .inspect_error([&](const std::string& e) { side = e; });
-
-    EXPECT_EQ(side, "oops");
+    std::string seen;
+    Result<int, std::string>::err("fail")
+        .inspect_error([&](const std::string& e) { seen = e; });
+    EXPECT_EQ(seen, "fail");
 }
 
-TEST(ResultTest, InspectErrorDoesNotInvokeOnValue)
+TEST(Result_Inspect, InspectErrorNotCalledOnOk)
 {
-    std::string side;
-
-    Result<int, std::string>::ok(42)
-        .inspect_error([&](const std::string& e) { side = e; });
-
-    EXPECT_TRUE(side.empty());
+    std::string seen;
+    Result<int, std::string>::ok(1)
+        .inspect_error([&](const std::string& e) { seen = e; });
+    EXPECT_TRUE(seen.empty());
 }
 
-TEST(ResultTest, InspectReturnsThisForChaining)
+TEST(Result_Inspect, InspectReturnsRefForChaining)
 {
-    int value_side = 0;
-    std::string error_side;
-
-    Result<int, std::string>::ok(42)
-        .inspect([&](int n) { value_side = n; })
-        .inspect_error([&](const std::string& e) { error_side = e; });
-
-    EXPECT_EQ(value_side, 42);
-    EXPECT_TRUE(error_side.empty());
+    int seen = 0;
+    const auto r = Result<int, std::string>::ok(9)
+        .inspect([&](int n) { seen = n; })
+        .transform([](int n) { return n + 1; });
+    EXPECT_EQ(seen, 9);
+    EXPECT_EQ(*r, 10);
 }
 
 // ============================================================================
 // Comparison
 // ============================================================================
 
-TEST(ResultTest, EqualOkResultsAreEqual)
+TEST(Result_Comparison, EqualOk)
 {
-    const auto a = Result<int, std::string>::ok(42);
-    const auto b = Result<int, std::string>::ok(42);
+    const auto a = Result<int, std::string>::ok(1);
+    const auto b = Result<int, std::string>::ok(1);
     EXPECT_EQ(a, b);
 }
 
-TEST(ResultTest, DifferentOkResultsAreNotEqual)
+TEST(Result_Comparison, UnequalOkDifferentValue)
 {
-    const auto a = Result<int, std::string>::ok(42);
-    const auto b = Result<int, std::string>::ok(99);
+    const auto a = Result<int, std::string>::ok(1);
+    const auto b = Result<int, std::string>::ok(2);
     EXPECT_NE(a, b);
 }
 
-TEST(ResultTest, EqualErrResultsAreEqual)
+TEST(Result_Comparison, EqualErr)
 {
-    const auto a = Result<int, std::string>::err("oops");
-    const auto b = Result<int, std::string>::err("oops");
+    const auto a = Result<int, std::string>::err("e");
+    const auto b = Result<int, std::string>::err("e");
     EXPECT_EQ(a, b);
 }
 
-TEST(ResultTest, OkAndErrAreNotEqual)
+TEST(Result_Comparison, OkAndErrNotEqual)
 {
-    const auto ok  = Result<int, std::string>::ok(42);
-    const auto err = Result<int, std::string>::err("oops");
-    EXPECT_NE(ok, err);
+    const auto a = Result<int, std::string>::ok(1);
+    const auto b = Result<int, std::string>::err("e");
+    EXPECT_NE(a, b);
 }
 
 // ============================================================================
-// Same T and E type
+// enum as E
 // ============================================================================
 
-TEST(ResultTest, WorksWhenTAndEAreSameType)
+enum class ParseError { InvalidInput, Overflow };
+
+TEST(Result_EnumError, EnumAsErrorType)
 {
-    const auto ok  = Result<std::string, std::string>::ok("value");
-    const auto err = Result<std::string, std::string>::err("error");
+    const auto r = Result<int, ParseError>::err(ParseError::InvalidInput);
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), ParseError::InvalidInput);
+}
 
-    EXPECT_TRUE(ok.has_value());
-    EXPECT_EQ(ok.value(), "value");
-
-    EXPECT_TRUE(err.is_error());
-    EXPECT_EQ(err.error(), "error");
+TEST(Result_EnumError, EnumPropagatesThroughTransform)
+{
+    const auto r = Result<int, ParseError>::err(ParseError::Overflow)
+        .transform([](int n) { return n * 2; });
+    EXPECT_TRUE(r.has_error());
+    EXPECT_EQ(r.error(), ParseError::Overflow);
 }
