@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-09-20
+
+### 🚀 Features
+
+- Add SemanticVersion container, parser, and tests ([a1dd22f](https://github.com/DMsuDev/foundry/commit/a1dd22f0097bbdce8c927f167eb2cb0b57c72a07))
+
+  - Add foundry::types::SemanticVersion supporting the full SemVer 2.0.0 specification
+  - Support core versioning, pre-release identifiers, and build metadata parsing/serialization
+  - Implement precedence rules ignoring build metadata during comparison
+  - Add semver_example demonstration code and comprehensive unit tests
+
+- Add Result<T, E> class for type-safe error handling ([7713d79](https://github.com/DMsuDev/foundry/commit/7713d794268de21e9edf8387d784d1abb3182c72))
+
+  - Add template class Result<T, E> representing success or error states
+  - Support value access, fallback strategies, and bad_result_access exception
+  - Implement monadic methods: map, map_error, and_then, or_else, inspect
+  - Add unit tests using Google Test and usage examples in result_example.cpp
+
+### 🚜 Refactor
+
+- Simplify versioning system using SemanticVersion ([dc18a3a](https://github.com/DMsuDev/foundry/commit/dc18a3a7eff3edc5f5fe19eb1da2f23f5509b3e5))
+
+  - Update CMake foundry_load_version function to parse core version and prerelease tag separately
+  - Replace legacy macro-based version.h.in with a single foundry::types::SemanticVersion instance
+  - Update target properties in CMakeLists.txt with clean binary naming and symbol visibility settings
+
+### 🔧 Maintenance
+
+- Update foundry.h umbrella header and clean up old files ([0e1ba2b](https://github.com/DMsuDev/foundry/commit/0e1ba2b73155e7ecb3294399c315d9d61140d30d))
+
 ## [0.3.0] - 2026-09-17
 
 ### 🚀 Features
