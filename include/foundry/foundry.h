@@ -5,9 +5,21 @@
 
 #pragma once
 
-// --- Memory ---
+// --------------------------------------------
+// MEMORY
+// --------------------------------------------
 #include "foundry/memory/scope_guard.h"
+#include "foundry/memory/run_once.h"
 
-// --- Types ---
+// --------------------------------------------
+// TYPES
+// --------------------------------------------
 #include "foundry/types/flags.h"
+#include "foundry/types/result.h"
 #include "foundry/types/bitmask.h"
+#include "foundry/types/semantic_version.h"
+
+// --------------------------------------------
+// PLATFORM
+// --------------------------------------------
+#include "foundry/platform/paths.h"
