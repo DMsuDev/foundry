@@ -123,7 +123,7 @@ if(BUILD_SHARED_LIBS)
   target_compile_definitions(Foundry PUBLIC FOUNDRY_SHARED_LIBRARY)
 
   # Private macro that is only defined when compiling the Foundry source files
-  target_compile_definitions(Foundry PRIVATE FOUNDRY_EXPORTS)
+  target_compile_definitions(Foundry PRIVATE FOUNDRY_EXPORT_SYMBOLS)
 
   set_target_properties(Foundry
     PROPERTIES
