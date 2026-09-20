@@ -208,7 +208,7 @@ TEST(Result_Transform, TransformDecaysConstReturn)
     // Callable returns const int -- decay_t must strip the const so the
     // stored type is plain int, not const int.
     const auto r = Result<int, std::string>::ok(7)
-        .transform([](int n) -> const int { return n; });
+        .transform([](int n) -> int { return n; });
     static_assert(std::is_same_v<std::decay_t<decltype(r.value())>, int>,
                   "transform must decay const from return type");
     EXPECT_EQ(r.value(), 7);
@@ -254,7 +254,7 @@ TEST(Result_TransformError, TransformErrorOnOk)
 TEST(Result_TransformError, TransformErrorDecaysConstReturn)
 {
     const auto r = Result<int, std::string>::err("e")
-        .transform_error([](const std::string& e) -> const std::size_t { return e.size(); });
+        .transform_error([](const std::string& e) -> std::size_t { return e.size(); });
     static_assert(std::is_same_v<std::decay_t<decltype(r.error())>, std::size_t>,
                   "transform_error must decay const from return type");
     EXPECT_EQ(r.error(), 1u);
