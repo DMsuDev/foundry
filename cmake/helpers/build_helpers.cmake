@@ -220,3 +220,46 @@ function(foundry_strip_dead_code target)
     >
   )
 endfunction()
+
+# ------------------------------------------------------------------------------
+# foundry_enable_coverage(target)
+#
+# Enables code coverage instrumentation for a target when
+# FOUNDRY_ENABLE_COVERAGE is enabled.
+#
+# Supported compilers:
+#   - GCC
+#   - Clang
+#   - AppleClang
+# ------------------------------------------------------------------------------
+
+function(foundry_enable_coverage target)
+  if(NOT FOUNDRY_ENABLE_COVERAGE)
+    return()
+  endif()
+
+  if(NOT TARGET "${target}")
+    message(FATAL_ERROR "foundry_enable_coverage: target '${target}' does not exist.")
+  endif()
+
+  _foundry_target_scope("${target}" _scope)
+
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options("${target}" ${_scope} --coverage)
+    target_link_options("${target}" ${_scope} --coverage)
+
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+    target_compile_options("${target}" ${_scope}
+      -fprofile-instr-generate
+      -fcoverage-mapping
+    )
+
+    target_link_options("${target}" ${_scope} -fprofile-instr-generate)
+
+  else()
+    message(FATAL_ERROR
+      "foundry_enable_coverage: compiler '${CMAKE_CXX_COMPILER_ID}' "
+      "does not support code coverage instrumentation."
+    )
+  endif()
+endfunction()

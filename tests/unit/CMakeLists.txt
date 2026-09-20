@@ -70,6 +70,7 @@ target_include_directories(foundry_tests
 # ------------------------------------------------------------------------------
 foundry_configure_compiler(foundry_tests)
 foundry_configure_warnings(foundry_tests)
+foundry_enable_coverage(foundry_tests)
 
 set_target_properties(foundry_tests PROPERTIES
   FOLDER "Foundry/Tests"

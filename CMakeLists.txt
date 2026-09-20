@@ -36,10 +36,11 @@ include("${FOUNDRY_BASE_FOLDER}/cmake/helpers/build_helpers.cmake")
 option(FOUNDRY_BUILD_TESTS           "Build Foundry's unit-test suite."               ${PROJECT_IS_TOP_LEVEL})
 option(FOUNDRY_BUILD_EXAMPLES        "Build Foundry's example programs."              ${PROJECT_IS_TOP_LEVEL})
 option(FOUNDRY_BUILD_WARNINGS        "Enable strict compiler warning suites."         ${PROJECT_IS_TOP_LEVEL})
+option(FOUNDRY_ENABLE_COVERAGE       "Enable code coverage for Foundry's tests."      OFF)
 # --- Warnings ---
 option(FOUNDRY_WARNINGS_AS_ERRORS    "Treat compiler warnings as hard errors."        OFF)
 # --- Integration Tests ---
-option(FOUNDRY_CONSUMER_TESTS        "Build Foundry's consumer integration tests."    OFF)
+option(FOUNDRY_CONSUMER_TESTS         "Build Foundry's consumer integration tests."    OFF)
 option(FOUNDRY_CONSUMER_TESTS_CLEANUP "Clean up install test artifacts after running." OFF)
 
 # ------------------------------------------------------------------------------
@@ -64,6 +65,10 @@ if(FOUNDRY_CONSUMER_TESTS_CLEANUP AND NOT FOUNDRY_CONSUMER_TESTS)
     "Disabling FOUNDRY_CONSUMER_TESTS_CLEANUP automatically."
   )
   set(FOUNDRY_CONSUMER_TESTS_CLEANUP OFF CACHE BOOL "" FORCE)
+endif()
+
+if(FOUNDRY_ENABLE_COVERAGE AND NOT FOUNDRY_BUILD_TESTS)
+  message(FATAL_ERROR "[Foundry] FOUNDRY_ENABLE_COVERAGE requires FOUNDRY_BUILD_TESTS=ON.")
 endif()
 
 # ------------------------------------------------------------------------------
@@ -115,6 +120,7 @@ target_include_directories(Foundry PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+foundry_enable_coverage(Foundry)
 target_compile_features(Foundry PUBLIC cxx_std_17)
 
 # --- Configuration of macro definitions Export/Import ---
