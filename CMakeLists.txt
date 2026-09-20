@@ -18,11 +18,11 @@ list(APPEND CMAKE_MODULE_PATH "${FOUNDRY_BASE_FOLDER}/cmake")
 #  Version
 # ------------------------------------------------------------------------------
 include(foundry_version)
-foundry_load_version(FOUNDRY_VERSION FOUNDRY_PLAIN_VERSION)
+foundry_load_version(FOUNDRY_VERSION FOUNDRY_VERSION_CORE FOUNDRY_VERSION_PRERELEASE)
 
 project(Foundry
   LANGUAGES   CXX
-  VERSION     ${FOUNDRY_PLAIN_VERSION}
+  VERSION     ${FOUNDRY_VERSION_CORE}
   DESCRIPTION "Cross-platform C++ utility library."
 )
 message(STATUS "${PROJECT_NAME} version: ${FOUNDRY_VERSION}")
@@ -121,12 +121,20 @@ target_compile_features(Foundry PUBLIC cxx_std_17)
 if(BUILD_SHARED_LIBS)
   # Define FOUNDRY_SHARED_LIBRARY globally for the library and its consumers
   target_compile_definitions(Foundry PUBLIC FOUNDRY_SHARED_LIBRARY)
+
   # Private macro that is only defined when compiling the Foundry source files
   target_compile_definitions(Foundry PRIVATE FOUNDRY_EXPORTS)
 
-  # On Linux/macOS, hide symbols by default except those explicitly marked for export.
-  set_target_properties(Foundry PROPERTIES CXX_VISIBILITY_PRESET hidden)
-  set_target_properties(Foundry PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+  set_target_properties(Foundry
+    PROPERTIES
+      # Output binary naming (applies to all platforms)
+      OUTPUT_NAME "foundry"
+      DEBUG_POSTFIX "d"
+
+      # Hide symbols by default unless explicitly exported (GCC/Clang)
+      CXX_VISIBILITY_PRESET hidden
+      VISIBILITY_INLINES_HIDDEN ON
+  )
 endif()
 
 # ------------------------------------------------------------------------------
