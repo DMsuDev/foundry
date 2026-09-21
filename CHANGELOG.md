@@ -4,6 +4,61 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-09-21
+
+### 💥 Breaking Changes
+
+- Align Result<T,E> monadic API with std::expected (C++23) ([45ab46b](https://github.com/DMsuDev/foundry/commit/45ab46b213ff768b70d2c626d7499a67f64a24bf))
+
+  Renamed methods to mirror the C++23 std::expected interface. Added error_or(), const&& overloads for value() and error(), rvalue overloads for inspect() and inspect_error(), and std::decay_t on transform() and transform_error() return types. Factory constructors no longer require T or E to be default-constructible.
+
+> ⚠️ map(), map_error() and is_error() are removed.
+- Replace .map(f)           with .transform(f)
+- Replace .map_error(f) with .transform_error(f)
+- Replace .is_error()       with .has_error()
+
+### 🚀 Features
+
+- Add `std::error_code` overloads to `path utilities` ([548b48e](https://github.com/DMsuDev/foundry/commit/548b48e5304485ff8619ec519ea7f666a6aa303b))
+
+  - Add non-throwing `std::error_code&` overloads for `working_directory`, `executable_path`, `executable_directory`, and `temp_directory`
+  - Replace runtime exceptions with standard `std::system_error` in throwing overloads
+
+### 🐛 Bug Fixes
+
+- Rename target export macro to `FOUNDRY_EXPORT_SYMBOLS` ([5f3a667](https://github.com/DMsuDev/foundry/commit/5f3a667d39fd762aed133cd1859ebc65b8f9ddb8))
+
+- Resolve executable path to canonical form on macOS ([2932d69](https://github.com/DMsuDev/foundry/commit/2932d691e8d5f46a6be322df1b91470b1f4d9876))
+
+  - Use `std::filesystem::canonical` on macOS to resolve symlinks and relative components
+  - Propagate filesystem error codes on canonicalization failure
+
+- Force -O0 flag when coverage is enabled ([2259ecf](https://github.com/DMsuDev/foundry/commit/2259ecfdea332fa506ad4e979decd9cf75ce5855))
+
+### 🛠️ Build System
+
+- Add `FOUNDRY_ENABLE_COVERAGE` option and helper function ([75fc57a](https://github.com/DMsuDev/foundry/commit/75fc57a4a451cb4dba732f49acc0c2cf095febb0))
+
+  - Introduce `FOUNDRY_ENABLE_COVERAGE` option with `FOUNDRY_BUILD_TESTS` dependency validation
+  - Add `foundry_enable_coverage` CMake helper to apply coverage flags for GCC and Clang targets
+  - Apply coverage instrumentation to main library and unit test targets
+
+### 🔧 Maintenance
+
+- Align `Result<T, E>` tests and examples with updated API ([e6e5c6d](https://github.com/DMsuDev/foundry/commit/e6e5c6d5e8cb2e11bfa9f0724418244614ba05e0))
+
+  - Update method calls to `has_error()`, `transform()`, and `transform_error()`
+  - Add tests and example for non-default-constructible types
+  - Expand test coverage for `error_or()`, identical `T`/`E` types, and enum errors
+
+- Refactor path tests to cover `std::error_code` overloads ([c399bcc](https://github.com/DMsuDev/foundry/commit/c399bcce23b0cce202a2e0f82a670645520ab635))
+
+- Use `__LINE__` for unique name macro ([9f54a71](https://github.com/DMsuDev/foundry/commit/9f54a715e28923cc2c11327567e8259f8269d99f))
+
+- Fix explicit lambda return types in `Result` transform tests ([be54205](https://github.com/DMsuDev/foundry/commit/be542051cd4789f1b0e204dc02c5ff2cebc4be3e))
+
+- Add code coverage workflow ([2e17cbc](https://github.com/DMsuDev/foundry/commit/2e17cbcb1bf1d650d41c5e0942cd4bb3f1eb3f75))
+
 ## [0.4.0] - 2026-09-20
 
 ### 🚀 Features
