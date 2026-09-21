@@ -104,12 +104,20 @@ std::filesystem::path executable_path(std::error_code& ec) noexcept
         return {};
     }
 
-    ec.clear();
-    // _NSGetExecutablePath() can return a non-canonical path.
-    return std::filesystem::path(buffer.data());
+    // _NSGetExecutablePath() can return a non-canonical path (e.g. with symlinks
+    // or ".." components), so resolve it to match the behaviour of the other platforms.
+    std::error_code canon_ec;
+    auto canonical = std::filesystem::canonical(std::filesystem::path(buffer.data()), canon_ec);
 
-#else
-    static_assert(false, "Unsupported platform for foundry::platform");
+    if (canon_ec)
+    {
+        ec = canon_ec;
+        return {};
+    }
+
+    ec.clear();
+    return canonical;
+
 #endif
 }
 
