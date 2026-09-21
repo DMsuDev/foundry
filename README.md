@@ -1,6 +1,7 @@
 # Foundry
 
 [![C++17](https://img.shields.io/badge/Language-C%2B%2B17-00599C?style=flat&logo=cplusplus&logoColor=white)](https://isocpp.org/)
+[![Coverage](https://codecov.io/gh/DMsuDev/foundry/graph/badge.svg)](https://codecov.io/gh/DMsuDev/foundry)
 [![Version](https://img.shields.io/github/v/release/DMsuDev/foundry?style=flat&label=Version&color=purple)](https://github.com/DMsuDev/foundry/releases/latest)
 [![License MIT](https://img.shields.io/github/license/DMsuDev/foundry?style=flat&label=License&logo=open-source-initiative&logoColor=white)](https://github.com/DMsuDev/foundry/blob/main/LICENSE)
 ![Platform Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat&logo=windows&logoColor=white)
@@ -33,6 +34,7 @@ FetchContent_Declare(
   foundry
   GIT_REPOSITORY https://github.com/DMsuDev/foundry.git
   GIT_TAG        # pin to a release tag or commit hash
+  GIT_SHALLOW    TRUE
 )
 
 FetchContent_MakeAvailable(foundry)
