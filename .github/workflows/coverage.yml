@@ -55,8 +55,7 @@ jobs:
             --directory build \
             --output-file coverage.info \
             --no-external \
-            --exclude "*/tests/unit/*" \
-            --exclude "*/examples/*"
+            --ignore-errors unused
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
