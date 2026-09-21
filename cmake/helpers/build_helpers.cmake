@@ -245,15 +245,18 @@ function(foundry_enable_coverage target)
   _foundry_target_scope("${target}" _scope)
 
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options("${target}" ${_scope} --coverage)
+    target_compile_options("${target}" ${_scope}
+      --coverage
+      -O0
+    )
     target_link_options("${target}" ${_scope} --coverage)
 
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
     target_compile_options("${target}" ${_scope}
       -fprofile-instr-generate
       -fcoverage-mapping
+      -O0
     )
-
     target_link_options("${target}" ${_scope} -fprofile-instr-generate)
 
   else()
