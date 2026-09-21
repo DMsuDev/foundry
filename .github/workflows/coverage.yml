@@ -52,7 +52,7 @@ jobs:
             --directory build \
             --output-file coverage.info \
             --no-external \
-            --exclude "*/tests/*" \
+            --exclude "*/tests/unit/*" \
             --exclude "*/examples/*"
 
       - name: Upload to Codecov
