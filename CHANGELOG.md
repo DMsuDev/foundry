@@ -35,6 +35,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 - Force -O0 flag when coverage is enabled ([2259ecf](https://github.com/DMsuDev/foundry/commit/2259ecfdea332fa506ad4e979decd9cf75ce5855))
 
+- Correct lcov exclude pattern for tests directory ([ee6d134](https://github.com/DMsuDev/foundry/commit/ee6d134f47707d911b83844d32f57a2b5c970a9b))
+
 ### 🛠️ Build System
 
 - Add `FOUNDRY_ENABLE_COVERAGE` option and helper function ([75fc57a](https://github.com/DMsuDev/foundry/commit/75fc57a4a451cb4dba732f49acc0c2cf095febb0))
