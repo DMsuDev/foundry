@@ -85,12 +85,11 @@ public:
     // -------------------------------------------------------------------------
 
     /// @brief Checks if core version (MAJOR.MINOR.PATCH) is >= given parameters.
-    [[nodiscard]] bool at_least(
-        std::uint32_t major,
-        std::uint32_t minor,
-        std::uint32_t patch) const noexcept
+    [[nodiscard]] bool at_least(std::uint32_t major, std::uint32_t minor, std::uint32_t patch) const noexcept
     {
-        return *this >= SemanticVersion{major, minor, patch};
+        if (m_major != major) return m_major > major;
+        if (m_minor != minor) return m_minor > minor;
+        return m_patch >= patch;
     }
 
     // -------------------------------------------------------------------------
