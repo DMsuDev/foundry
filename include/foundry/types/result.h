@@ -6,6 +6,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -53,10 +54,24 @@ namespace foundry {
 /// @brief Exception thrown when accessing a Result in the wrong state.
 ///
 /// Thrown by `value()` on an error result, or `error()` on a success result.
+/// When thrown by `value()`, carries a copy of the error that caused the
+/// failure -- mirrors `std::bad_expected_access<E>` (C++23). When thrown by
+/// `error()`, there is no error to report, so `error()` on the exception
+/// itself returns an empty `std::optional`.
+template <typename E>
 class bad_result_access : public std::logic_error
 {
 public:
     explicit bad_result_access(const char* what) : std::logic_error(what) {}
+
+    bad_result_access(E error, const char* what)
+        : std::logic_error(what), m_error(std::move(error)) {}
+
+    /// @brief Returns the error that caused this exception, if any.
+    [[nodiscard]] const std::optional<E>& error() const& noexcept { return m_error; }
+
+private:
+    std::optional<E> m_error;
 };
 
 // ============================================================================
@@ -95,6 +110,16 @@ class Result
     using Storage = std::variant<detail::OkHolder<T>, detail::ErrHolder<E>>;
 
 public:
+    // -------------------------------------------------------------------------
+    // Member types
+    // -------------------------------------------------------------------------
+
+    /// @brief The type of the contained value on success. Mirrors `std::expected::value_type`.
+    using value_type = T;
+
+    /// @brief The type of the contained value on failure. Mirrors `std::expected::error_type`.
+    using error_type = E;
+
     // -------------------------------------------------------------------------
     // Factory constructors
     // -------------------------------------------------------------------------
@@ -135,25 +160,25 @@ public:
     /// @{
     [[nodiscard]] T& value() &
     {
-        if (!has_value()) { throw bad_result_access("called value() on an error Result"); }
+        if (!has_value()) { throw bad_result_access<E>(std::get<1>(m_storage).value, "called value() on an error Result"); }
         return std::get<0>(m_storage).value;
     }
 
     [[nodiscard]] const T& value() const&
     {
-        if (!has_value()) { throw bad_result_access("called value() on an error Result"); }
+        if (!has_value()) { throw bad_result_access<E>(std::get<1>(m_storage).value, "called value() on an error Result"); }
         return std::get<0>(m_storage).value;
     }
 
     [[nodiscard]] T&& value() &&
     {
-        if (!has_value()) { throw bad_result_access("called value() on an error Result"); }
+        if (!has_value()) { throw bad_result_access<E>(std::get<1>(m_storage).value, "called value() on an error Result"); }
         return std::move(std::get<0>(m_storage).value);
     }
 
     [[nodiscard]] const T&& value() const&&
     {
-        if (!has_value()) { throw bad_result_access("called value() on an error Result"); }
+        if (!has_value()) { throw bad_result_access<E>(std::get<1>(m_storage).value, "called value() on an error Result"); }
         return std::move(std::get<0>(m_storage).value);
     }
     /// @}
@@ -200,25 +225,25 @@ public:
     /// @{
     [[nodiscard]] E& error() &
     {
-        if (!has_error()) { throw bad_result_access("called error() on a success Result"); }
+        if (!has_error()) { throw bad_result_access<E>("called error() on a success Result"); }
         return std::get<1>(m_storage).value;
     }
 
     [[nodiscard]] const E& error() const&
     {
-        if (!has_error()) { throw bad_result_access("called error() on a success Result"); }
+        if (!has_error()) { throw bad_result_access<E>("called error() on a success Result"); }
         return std::get<1>(m_storage).value;
     }
 
     [[nodiscard]] E&& error() &&
     {
-        if (!has_error()) { throw bad_result_access("called error() on a success Result"); }
+        if (!has_error()) { throw bad_result_access<E>("called error() on a success Result"); }
         return std::move(std::get<1>(m_storage).value);
     }
 
     [[nodiscard]] const E&& error() const&&
     {
-        if (!has_error()) { throw bad_result_access("called error() on a success Result"); }
+        if (!has_error()) { throw bad_result_access<E>("called error() on a success Result"); }
         return std::move(std::get<1>(m_storage).value);
     }
     /// @}
@@ -438,12 +463,29 @@ public:
         return !(*this == other);
     }
 
+    // -------------------------------------------------------------------------
+    // Swap
+    // -------------------------------------------------------------------------
+
+    /// @brief Exchanges the contents of this Result with @p other.
+    void swap(Result& other) noexcept(std::is_nothrow_swappable_v<Storage>)
+    {
+        m_storage.swap(other.m_storage);
+    }
+
 private:
     Storage m_storage;
 
     explicit Result(detail::OkHolder<T> h)  : m_storage(std::move(h)) {}
     explicit Result(detail::ErrHolder<E> h) : m_storage(std::move(h)) {}
 };
+
+/// @brief Exchanges the contents of @p lhs and @p rhs. Enables ADL-found `swap`.
+template <typename T, typename E>
+void swap(Result<T, E>& lhs, Result<T, E>& rhs) noexcept(noexcept(lhs.swap(rhs)))
+{
+    lhs.swap(rhs);
+}
 
 } // namespace types
 

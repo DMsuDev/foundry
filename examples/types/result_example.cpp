@@ -230,9 +230,10 @@ static void Demo_BadResultAccess()
     {
         [[maybe_unused]] const int n = err.value();
     }
-    catch (const foundry::bad_result_access& e)
+    catch (const foundry::bad_result_access<std::string>& e)
     {
         std::cout << "Caught foundry::bad_result_access: " << e.what() << "\n";
+        if (e.error()) { std::cout << "Carried error: " << *e.error() << "\n"; }
     }
 }
 
