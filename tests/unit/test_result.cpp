@@ -114,7 +114,22 @@ TEST(Result_ValueAccess, ValueOnOk)
 TEST(Result_ValueAccess, ValueOnErrThrows)
 {
     const auto r = Result<int, std::string>::err("e");
-    EXPECT_THROW({ (void)r.value(); }, bad_result_access);
+    EXPECT_THROW({ (void)r.value(); }, bad_result_access<std::string>);
+}
+
+TEST(Result_ValueAccess, ValueOnErrThrowsWithCarriedError)
+{
+    const auto r = Result<int, std::string>::err("oops");
+    try
+    {
+        (void)r.value();
+        FAIL() << "expected bad_result_access<std::string>";
+    }
+    catch (const bad_result_access<std::string>& ex)
+    {
+        ASSERT_TRUE(ex.error().has_value());
+        EXPECT_EQ(*ex.error(), "oops");
+    }
 }
 
 TEST(Result_ValueAccess, DerefOperator)
@@ -154,7 +169,7 @@ TEST(Result_ErrorAccess, ErrorOnErr)
 TEST(Result_ErrorAccess, ErrorOnOkThrows)
 {
     const auto r = Result<int, std::string>::ok(1);
-    EXPECT_THROW({ (void)r.error(); }, bad_result_access);
+    EXPECT_THROW({ (void)r.error(); }, bad_result_access<std::string>);
 }
 
 TEST(Result_ErrorAccess, ErrorOrOnErr)
