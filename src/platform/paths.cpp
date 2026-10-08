@@ -13,6 +13,7 @@
 #elif defined(__linux__)
     #include <unistd.h>
     #include <limits.h>
+    #include <cerrno>
 #elif defined(__APPLE__)
     #include <mach-o/dyld.h>
     #include <limits.h>

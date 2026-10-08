@@ -32,7 +32,7 @@
         #endif
 
     // ---- GCC/Clang visible platforms (Linux, macOS, etc.) ----------------
-    #elif defined(__linux__) || defined(__APPLE__) && defined(__MACH__)
+    #elif defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
         #define FOUNDRY_EXPORT __attribute__((visibility("default")))
 
     // ---- Unknown platform ------------------------------------------------
