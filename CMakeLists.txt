@@ -28,6 +28,8 @@ project(Foundry
 message(STATUS "${PROJECT_NAME} version: ${FOUNDRY_VERSION}")
 include("${FOUNDRY_BASE_FOLDER}/cmake/helpers/build_helpers.cmake")
 
+foundry_configure_cmake()
+
 # ------------------------------------------------------------------------------
 #  Configuration Options
 # ------------------------------------------------------------------------------
@@ -52,19 +54,13 @@ if (DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 if(FOUNDRY_WARNINGS_AS_ERRORS AND NOT FOUNDRY_BUILD_WARNINGS)
-  message(WARNING
-    "[Foundry] FOUNDRY_WARNINGS_AS_ERRORS requires FOUNDRY_BUILD_WARNINGS. "
-    "Enabling FOUNDRY_BUILD_WARNINGS automatically."
-  )
-  set(FOUNDRY_BUILD_WARNINGS ON CACHE BOOL "" FORCE)
+  message(FATAL_ERROR
+    "[Foundry] FOUNDRY_WARNINGS_AS_ERRORS=ON requires FOUNDRY_BUILD_WARNINGS=ON. "
+    "Either set both to ON or disable FOUNDRY_WARNINGS_AS_ERRORS.")
 endif()
 
 if(FOUNDRY_CONSUMER_TESTS_CLEANUP AND NOT FOUNDRY_CONSUMER_TESTS)
-  message(WARNING
-    "[Foundry] FOUNDRY_CONSUMER_TESTS_CLEANUP requires FOUNDRY_CONSUMER_TESTS. "
-    "Disabling FOUNDRY_CONSUMER_TESTS_CLEANUP automatically."
-  )
-  set(FOUNDRY_CONSUMER_TESTS_CLEANUP OFF CACHE BOOL "" FORCE)
+  message(FATAL_ERROR "[Foundry] FOUNDRY_CONSUMER_TESTS_CLEANUP=ON requires FOUNDRY_CONSUMER_TESTS=ON.")
 endif()
 
 if(FOUNDRY_ENABLE_COVERAGE AND NOT FOUNDRY_BUILD_TESTS)
@@ -87,12 +83,6 @@ if(PROJECT_IS_TOP_LEVEL)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-
-  # Single-config generators: default to Release when no build type is set.
-  if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build configuration." FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-  endif()
 endif()
 
 # ------------------------------------------------------------------------------
@@ -109,7 +99,7 @@ configure_file(
 # ------------------------------------------------------------------------------
 option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 
-file(GLOB_RECURSE FOUNDRY_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE FOUNDRY_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 add_library(Foundry ${FOUNDRY_SOURCES})
 add_library(Foundry::Foundry ALIAS Foundry)
@@ -120,7 +110,11 @@ target_include_directories(Foundry PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+foundry_configure_compiler(Foundry)
+foundry_configure_warnings(Foundry)
 foundry_enable_coverage(Foundry)
+foundry_strip_dead_code(Foundry)
+
 target_compile_features(Foundry PUBLIC cxx_std_17)
 
 # --- Configuration of macro definitions Export/Import ---
