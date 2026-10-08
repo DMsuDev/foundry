@@ -32,18 +32,21 @@ endfunction()
 # ------------------------------------------------------------------------------
 
 function(foundry_configure_cmake)
+  # Configure RPATH for shared builds
   if(BUILD_SHARED_LIBS)
     if(APPLE)
       set(CMAKE_INSTALL_RPATH "@loader_path" PARENT_SCOPE)
       set(CMAKE_BUILD_RPATH   "@loader_path" PARENT_SCOPE)
     elseif(UNIX)
-      set(CMAKE_INSTALL_RPATH "\$ORIGIN" PARENT_SCOPE)
-      set(CMAKE_BUILD_RPATH   "\$ORIGIN" PARENT_SCOPE)
+      set(CMAKE_INSTALL_RPATH "$ORIGIN" PARENT_SCOPE)
+      set(CMAKE_BUILD_RPATH   "$ORIGIN" PARENT_SCOPE)
     endif()
 
     set(CMAKE_POSITION_INDEPENDENT_CODE ON CACHE BOOL "Enable position independent code for all targets" FORCE)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON PARENT_SCOPE)
   endif()
 
+  # Set default build type for single-config generators
   if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build configuration." FORCE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
