@@ -101,9 +101,10 @@ public:
     // Query
     // -------------------------------------------------------------------------
 
-    /// @brief Returns true if ALL bits in @p flags are set.
+    /// @brief Returns true if ALL bits in @p flag are set.
     [[nodiscard]] constexpr bool has(E flag) const noexcept {
-        return (m_bits & static_cast<underlying_type>(flag)) != 0;
+        const auto bits = static_cast<underlying_type>(flag);
+        return (m_bits & bits) == bits;
     }
 
     /// @brief Returns true if ALL bits in @p flags are set.
@@ -198,6 +199,11 @@ template <typename E, typename = std::enable_if_t<::foundry::types::detail::enab
 template <typename E, typename = std::enable_if_t<::foundry::types::detail::enable_flags_v<E>>>
 [[nodiscard]] constexpr foundry::types::Flags<E> operator&(E lhs, foundry::types::Flags<E> rhs) noexcept {
     return foundry::types::Flags<E>(lhs) & rhs;
+}
+
+template <typename E, typename = std::enable_if_t<::foundry::types::detail::enable_flags_v<E>>>
+[[nodiscard]] constexpr foundry::types::Flags<E> operator^(E lhs, foundry::types::Flags<E> rhs) noexcept {
+    return foundry::types::Flags<E>(lhs) ^ rhs;
 }
 
 /// @endcond
