@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [0.6.0-WIP] - 2026-10-09
+## [0.6.0] - 2026-10-09
 
 ### 💥 Breaking Changes
 
