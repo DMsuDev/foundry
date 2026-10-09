@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Conventional Commits](https://www.conventionalcommits.org/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.0-WIP] - 2026-10-09
+
+### 💥 Breaking Changes
+
+- Enhance Result error access and swapping ([7a0574e](https://github.com/DMsuDev/foundry/commit/7a0574ea87469e6c909f2a98a0d1fd712bd394e2))
+
+  - Make bad_result_access a template that carries the error value when value() is accessed on an error result.
+  - Add error() to bad_result_access to retrieve the optional carried error.
+  - Add value_type and error_type aliases to Result.
+  - Implement member and ADL-compatible swap for Result.
+
+> ⚠️ bad_result_access is now a class template and must be referenced as bad_result_access<E>. Update existing exception handlers and usages accordingly.
+
+### 🚀 Features
+
+- Expose library version through main header ([9347198](https://github.com/DMsuDev/foundry/commit/93471982f08e9ea8dcfe6948294081d4ec85f2c2))
+
+### 🐛 Bug Fixes
+
+- Rely on --no-external for lcov filtering ([4bd02af](https://github.com/DMsuDev/foundry/commit/4bd02af663d58ebf2e02f4f767bf240fec166848))
+
+- Improve logic in at_least method for version comparison ([9c53594](https://github.com/DMsuDev/foundry/commit/9c53594fe583e50648b7f0e47d1b31e5485f9b02))
+
+- Correct Apple conditionals and include <cerrno> ([20cd96d](https://github.com/DMsuDev/foundry/commit/20cd96d39fe04fa40070f4859aa1e960ff36f3f7))
+
+- Improve RPATH configuration and default build type ([9c5b138](https://github.com/DMsuDev/foundry/commit/9c5b13804a6dc67363c9f93f0acfa04e1fb89dd7))
+
+- Enhance configuration checks and improve error handling ([8b42a13](https://github.com/DMsuDev/foundry/commit/8b42a133fd4efa97f50afeb90daba5f47903fc25))
+
+- Correct has method logic and add bitwise XOR operator for Flags ([d5dd205](https://github.com/DMsuDev/foundry/commit/d5dd205993c10978552f4812130a670b788ff7ca))
+
+### 🔧 Maintenance
+
+- Update paths include and `workflow_dispatch` ([b02fda7](https://github.com/DMsuDev/foundry/commit/b02fda766fb1645cbd2f552e8853ae570df7728e))
+
+- Verify error propagation in Result access exceptions ([b9130ad](https://github.com/DMsuDev/foundry/commit/b9130ad64e948145a4079181b67aa0ed921e8c1d))
+
 ## [0.5.0] - 2026-09-21
 
 ### 💥 Breaking Changes
